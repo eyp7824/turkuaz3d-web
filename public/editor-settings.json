@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "mobile": {
+    "heroTitle": "",
+    "heroDesc": "",
+    "accent": "#06ddd8",
+    "titleSize": 42,
+    "imageUrl": "",
+    "hideImage": false
+  },
+  "desktop": {
+    "heroTitle": "",
+    "heroDesc": "",
+    "accent": "#06ddd8",
+    "titleSize": 66,
+    "imageUrl": "",
+    "hideImage": false
+  }
+}

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071d2b"><meta name="robots" content="noindex,nofollow"><title>Turkuaz 3D Web — Yönetim</title>
+<link rel="icon" href="/favicon-96x96.png" type="image/png">
+<style>
+:root{color-scheme:dark;--bg:#061824;--panel:#0b2938;--panel2:#102f40;--cyan:#02e1da;--light:#ebfbfc;--muted:#abc5ce;--border:#244653}*{box-sizing:border-box}
+body{font-family:system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--light);margin:0;font-size:15px}button,input,textarea,select{font:inherit}a{color:#73e8e6}
+header{display:flex;gap:15px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border);background:#071d2b}
+.logo{width:53px;height:53px}h1{font-size:23px;margin:0}h1 span{color:var(--cyan)}header small{color:var(--muted)}
+.shell{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:calc(100dvh - 90px)}
+nav{padding:21px 14px;background:#081e2a;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+nav button{color:var(--light);padding:14px 16px;border:0;text-align:left;border-radius:13px;background:transparent;cursor:pointer}
+nav button.selected,nav button:hover{background:#174050;color:#8efcf6}
+main{padding:26px;max-width:1480px;width:100%;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+h2{font-size:28px;letter-spacing:-.03em;margin:8px 0 6px}h3{font-size:18px;margin:0 0 13px}
+p{color:var(--muted);line-height:1.55}.tag{display:inline-block;border-radius:50px;padding:7px 12px;background:#17413d;color:#a5f7e9;font-size:12px}
+.bad{background:#443320;color:#ffd49b}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:24px 0}
+.card{background:linear-gradient(150deg,#102f40,#092533);padding:22px;border:1px solid var(--border);border-radius:19px;min-width:0}
+.card .number{font-size:30px;font-weight:800;color:var(--cyan);margin:10px 0}.card small{color:var(--muted)}
+.flex{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+input,textarea,select{display:block;width:100%;border:1px solid #375764;background:#061c28;border-radius:11px;color:var(--light);padding:13px;margin:7px 0 17px;outline-offset:3px}
+input[type=color]{height:52px;max-width:120px;padding:5px}
+label{font-size:14px;font-weight:650}textarea{resize:vertical;min-height:103px}
+button.action,.btn{border:0;border-radius:12px;background:var(--cyan);color:#01232c;font-weight:800;padding:13px 17px;cursor:pointer}
+button.action:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:#254653;color:white}
+.note{padding:13px 16px;border-left:3px solid var(--cyan);background:#092c3b;color:#c4e3ea;border-radius:8px}
+.columns{display:grid;grid-template-columns:minmax(270px,420px) minmax(0,1fr);gap:20px;margin-top:22px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button{color:var(--light);background:#153747;border:1px solid #2e5764;border-radius:10px;padding:9px 14px;cursor:pointer}.toolbar button.active{background:var(--cyan);color:#03262d}
+#frameWrap{padding:15px;background:#193746;border:1px solid #32505a;border-radius:20px;display:flex;justify-content:center;min-height:650px}
+#preview{width:390px;max-width:100%;height:635px;background:#fff;border:0;border-radius:14px;box-shadow:0 18px 55px #0007}
+#preview.wide{width:100%;height:690px}
+.hidden{display:none!important}#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);max-width:90%;padding:14px 19px;background:#186060;border-radius:10px;color:white;display:none;z-index:10}
+hr{border:0;border-top:1px solid var(--border);margin:22px 0}
+@media(max-width:850px){.shell{display:block}nav{flex-direction:row;position:sticky;top:0;z-index:2;padding:8px;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}nav button{white-space:nowrap;padding:11px}main{padding:16px}.cards{grid-template-columns:1fr 1fr}.columns{display:block}.columns>.card{margin-bottom:15px}h2{font-size:23px}#frameWrap{padding:7px}header{padding:12px}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.logo{width:43px;height:43px}header h1{font-size:21px}}
+</style></head>
+<body><header><img class="logo" alt="Turkuaz 3D logo" src="/assets/img/logo.svg"><div><h1>TURKUAZ <span>3D WEB</span></h1><small>Web sitesi yönetim merkezi · turkuaz3d.com</small></div></header>
+<div class="shell"><nav><button type="button" data-view="dashboard" class="selected">◈ Genel Bakış</button><button type="button" data-view="editor">✎ Tasarım Düzenle</button><button type="button" data-view="stats">▥ Ziyaretçi Trafiği</button><button type="button" data-view="account">⚙ GitHub Bağlantısı</button></nav>
+<main>
+<section id="dashboard">
+<div class="top"><div><span class="tag">TURKUAZ 3D · YÖNETİM</span><h2>Web siten senin kontrolünde</h2><p>Telefon uygulamasında mobil görünümü, bilgisayarda ise mobil ve masaüstü görünümünü düzenle.</p></div><a class="btn secondary" target="_blank" rel="noopener" href="https://turkuaz3d.com/">Siteyi Aç ↗</a></div>
+<div class="cards"><div class="card"><small>Bugünkü ziyaretçi</small><div class="number">—</div><small>Ölçüm hizmeti bağlanmadı</small></div>
+<div class="card"><small>Şehir / ülke dağılımı</small><div class="number">—</div><small>Gerçek veriler için analitik bağlantısı gerekli</small></div>
+<div class="card"><small>Anlık ziyaret bildirimi</small><div class="number" style="font-size:19px">Bağlı değil</div><small>Bildirim sunucusu henüz kurulmadı</small></div></div>
+<div class="card"><h3>Hızlı işlemler</h3><div class="flex"><button class="action" id="quickEdit">Mobil Tasarımı Aç</button><a class="btn secondary" href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console ↗</a></div><p>Değişiklikleri yayınlamak için yalnızca Turkuaz 3D GitHub deposuna erişim izni olan hesabın belirteci gerekir. Belirteç sunucumuza gönderilmez ve cihazın oturumu kapatılınca silinir.</p></div>
+</section>
+<section id="editor" class="hidden"><div class="top"><div><span class="tag">GÖRSEL EDİTÖR</span><h2>Site tasarımını değiştir</h2><p>Önizle; beğendiğinde GitHub üzerinden yayınla.</p></div><div class="toolbar" id="deviceTabs"><button class="active" type="button" data-device="mobile">📱 Mobil</button><button type="button" data-device="desktop">▣ Masaüstü</button></div></div>
+<div class="columns"><div class="card"><h3 id="editTitle">Mobil görünüm ayarları</h3>
+<label for="heroTitle">Ana sayfa başlığı</label><input id="heroTitle" maxlength="140" placeholder="Boş bırakılırsa mevcut başlık korunur">
+<label for="heroDesc">Tanıtım yazısı</label><textarea id="heroDesc" maxlength="750" placeholder="Boş bırakılırsa mevcut açıklama korunur"></textarea>
+<label for="accent">Turkuaz vurgu rengi</label><input type="color" id="accent" value="#02e1da">
+<label for="titleSize">Başlık yazı boyutu (piksel)</label><input type="number" id="titleSize" min="25" max="90" value="42">
+<label for="imageUrl">Üst bölüm görseli (https:// görsel adresi)</label><input id="imageUrl" placeholder="Boş bırakılırsa mevcut görsel kullanılır">
+<label for="hideImage" style="display:flex;align-items:center;gap:10px"><input id="hideImage" type="checkbox" style="width:auto;margin:0"> Görseli gizle</label>
+<hr><div class="flex"><button class="action" type="button" id="publish">Değişiklikleri Yayınla</button><button class="btn secondary" type="button" id="reset">Bu görünümü sıfırla</button></div>
+<p class="note" id="editorNote">Düzenleme alanı hazır. Yayınlama için GitHub hesabını bağla.</p></div>
+<div><div id="frameWrap"><iframe id="preview" title="Turkuaz 3D canlı önizleme" src="https://turkuaz3d.com/"></iframe></div><p>Önizleme mevcut siteni gösterir. Değişiklikleri uygulama anında burada görebilirsin.</p></div></div>
+</section>
+<section id="stats" class="hidden"><span class="tag bad">BAĞLANTI GEREKLİ</span><h2>Ziyaretçi trafiği</h2>
+<div class="cards"><div class="card"><small>Canlı ziyaretçiler</small><div class="number">—</div></div><div class="card"><small>Ziyaret edilen şehirler</small><div class="number">—</div></div><div class="card"><small>Ortalama ziyaret süresi</small><div class="number">—</div></div></div>
+<div class="card"><h3>Veri durumu</h3><p>Web sitesinde henüz ziyaret olaylarını kaydeden ve uygulamaya ileten bir analiz sunucusu bağlı değil. Bu yüzden ziyaretçi sayısı, IP veya şehir bilgisi uydurulmaz. Ücretsiz analitik altyapısı kurulduğunda burada gerçek veriler açılacak.</p><p>Anlık telefon bildirimleri de bildirim servisinin bağlanmasını gerektirir.</p></div></section>
+<section id="account" class="hidden"><span class="tag">GÜVENLİ YAYINLAMA</span><h2>GitHub bağlantısı</h2>
+<div class="card" style="max-width:720px"><h3>Turkuaz 3D sitesine yayınlama</h3><p>GitHub'da sadece <strong>eyp7824/turkuaz3d-web</strong> deposuna <strong>Contents: Read and write</strong> erişimli ince kapsamlı bir belirteç oluştur. Şifreni veya doğrulama kodlarını buraya yazma.</p>
+<label for="token">GitHub ince kapsamlı erişim belirteci</label><input type="password" id="token" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+<div class="flex"><button class="action" id="connect">Bağlan ve Doğrula</button><button class="btn secondary" id="disconnect">Oturumu Kapat</button></div><p id="connection">GitHub bağlantısı bekleniyor.</p>
+<p><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub erişim belirteci oluştur ↗</a></p></div></section>
+</main></div><div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var repo='eyp7824/turkuaz3d-web', filePath='public/editor-settings.json', origin='https://turkuaz3d.com/';
+var phoneOnly = new URLSearchParams(location.search).get('mode')==='android' || (new URLSearchParams(location.search).get('mode')!=='windows' && innerWidth<700);
+var device='mobile', data={mobile:{},desktop:{}}, sha='', token=sessionStorage.getItem('t3-session-token')||'';
+var fields=['heroTitle','heroDesc','accent','titleSize','imageUrl','hideImage'];
+var el=function(id){return document.getElementById(id)};
+var defaults=function(){return {heroTitle:'',heroDesc:'',accent:'#02e1da',titleSize:42,imageUrl:'',hideImage:false}};
+function toast(s){el('toast').textContent=s;el('toast').style.display='block';setTimeout(function(){el('toast').style.display='none'},3800)}
+function view(name){['dashboard','editor','stats','account'].forEach(function(k){el(k).classList.toggle('hidden',k!==name)});document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('selected',b.dataset.view===name)})}
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){view(b.dataset.view)}});el('quickEdit').onclick=function(){view('editor')};
+if(phoneOnly){el('deviceTabs').style.display='none'}
+function readFields(){var o={};fields.forEach(function(k){o[k]=k==='hideImage'?el(k).checked:(k==='titleSize'?Number(el(k).value):el(k).value)});return o}
+function fill(){var x=Object.assign(defaults(),data[device]||{});fields.forEach(function(k){if(k==='hideImage'){el(k).checked=!!x[k]}else{el(k).value=x[k]||((k==='titleSize')?42:'')}});el('editTitle').textContent=device==='mobile'?'Mobil görünüm ayarları':'Masaüstü görünüm ayarları';el('preview').classList.toggle('wide',device==='desktop');preview()}
+function preview(){try{el('preview').contentWindow.postMessage({type:'T3_PREVIEW',device:device,settings:readFields()},origin)}catch(e){}}
+document.querySelectorAll('#deviceTabs button').forEach(function(b){b.onclick=function(){data[device]=readFields();device=b.dataset.device;document.querySelectorAll('#deviceTabs button').forEach(function(x){x.classList.toggle('active',x===b)});fill()}});
+fields.forEach(function(k){el(k).addEventListener(k==='hideImage'?'change':'input',preview)});
+el('preview').addEventListener('load',preview);
+function utf8FromB64(s){var bytes=Uint8Array.from(atob(s.replace(/\\s/g,'')),function(c){return c.charCodeAt(0)});return new TextDecoder().decode(bytes)}
+function b64Utf8(s){return btoa(Array.from(new TextEncoder().encode(s),function(c){return String.fromCharCode(c)}).join(''))}
+function endpoint(){return 'https://api.github.com/repos/'+repo+'/contents/'+filePath}
+async function fetchSettings(withToken){
+ var headers={'Accept':'application/vnd.github+json'};if(withToken&&token)headers.Authorization='Bearer '+token;
+ var r=await fetch(endpoint()+'?ref=main',{headers:headers,cache:'no-store'});
+ if(!r.ok)throw Error(r.status===401?'Belirteç geçersiz':r.status===403?'GitHub izinleri yetersiz':'GitHub yanıtı: '+r.status);
+ var j=await r.json();sha=j.sha;var parsed=JSON.parse(utf8FromB64(j.content));
+ data.mobile=Object.assign(defaults(),parsed.mobile||{});data.desktop=Object.assign(defaults(),parsed.desktop||{});fill();return true;
+}
+el('connect').onclick=async function(){var candidate=el('token').value.trim();if(!candidate){toast('Önce erişim belirtecini yaz');return}token=candidate;try{await fetchSettings(true);sessionStorage.setItem('t3-session-token',token);el('token').value='';el('connection').textContent='✓ GitHub deposuna bağlantı kuruldu.';el('editorNote').textContent='GitHub bağlantısı hazır. Düzenleyip yayınlayabilirsin.';toast('Bağlandı');view('editor')}catch(e){token='';toast('Bağlantı hatası: '+e.message)}};
+el('disconnect').onclick=function(){sessionStorage.removeItem('t3-session-token');token='';sha='';el('connection').textContent='Oturum kapatıldı';toast('Bağlantı kapatıldı')};
+el('reset').onclick=function(){data[device]=defaults();fill();toast('Varsayılan değerler seçildi; yayınlamak için Kaydet düğmesine bas')};
+el('publish').onclick=async function(){
+ if(!token){view('account');toast('Yayınlamak için önce GitHub bağlantısı kur');return}
+ data[device]=readFields();if(data[device].imageUrl && !/^https:\/\//i.test(data[device].imageUrl)){toast('Görsel adresi https:// ile başlamalı');return}
+ el('publish').disabled=true;el('editorNote').textContent='GitHub kaydı yapılıyor...';
+ try{
+ var headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'};
+ var check=await fetch(endpoint()+'?ref=main',{headers:headers,cache:'no-store'});if(!check.ok)throw Error('Dosya okunamadı: '+check.status);
+ var current=await check.json(),payload=JSON.parse(utf8FromB64(current.content));
+ payload[device]=data[device];
+ var r=await fetch(endpoint(),{method:'PUT',headers:headers,body:JSON.stringify({message:'Update Turkuaz 3D '+device+' website design via management app',branch:'main',sha:current.sha,content:b64Utf8(JSON.stringify(payload,null,2)+'\n')})});
+ if(!r.ok)throw Error('Yayınlama başarısız: '+r.status+' '+(await r.text()).slice(0,200));
+ el('editorNote').textContent='Kaydedildi. GitHub Pages yayını birkaç dakika içinde günceller.';toast('✓ Değişiklikler GitHub’a kaydedildi');setTimeout(function(){el('preview').src=origin+'?editor_preview='+Date.now()},3000);
+ }catch(e){el('editorNote').textContent=e.message;toast(e.message)}finally{el('publish').disabled=false}
+};
+fetchSettings(false).catch(function(e){el('editorNote').textContent='Ayarlara erişilemiyor: '+e.message;fill()});
+if(token){el('connection').textContent='Oturum belirteci mevcut. Yayınlamadan önce yeniden doğrulanacak.'}
+})();
+</script></body></html>
