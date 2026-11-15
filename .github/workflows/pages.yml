@@ -22,7 +22,7 @@ jobs:
       - name: Prepare website
         run: |
           mkdir -p _site
-          cp index.html CNAME robots.txt sitemap.xml _site/
+          cp index.html 404.html CNAME robots.txt sitemap.xml _site/
           cp -R assets hizmetler _site/
           cp gizlilik.html cerez.html kvkk.html _site/
       - name: Set up GitHub Pages
