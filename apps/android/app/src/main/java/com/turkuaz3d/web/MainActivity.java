@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android";
+    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=4";
     private WebView browser;
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +31,14 @@ public class MainActivity extends Activity {
         browser.getSettings().setJavaScriptEnabled(true);
         browser.getSettings().setDomStorageEnabled(true);
         browser.getSettings().setUseWideViewPort(true);
-        browser.getSettings().setLoadWithOverviewMode(true);
+        browser.getSettings().setLoadWithOverviewMode(false);
         browser.getSettings().setTextZoom(100);
         browser.getSettings().setSupportZoom(false);
         browser.getSettings().setBuiltInZoomControls(false);
         browser.getSettings().setDisplayZoomControls(false);
-        browser.setInitialScale(0);
+        browser.setInitialScale(100);
+        browser.getSettings().setCacheMode(android.webkit.WebSettings.LOAD_NO_CACHE);
+        browser.clearCache(true);
         browser.getSettings().setAllowFileAccess(false);
         browser.getSettings().setAllowContentAccess(false);
         browser.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
