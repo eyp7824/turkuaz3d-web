@@ -30,6 +30,13 @@ public class MainActivity extends Activity {
         browser.setBackgroundColor(Color.rgb(6,24,36));
         browser.getSettings().setJavaScriptEnabled(true);
         browser.getSettings().setDomStorageEnabled(true);
+        browser.getSettings().setUseWideViewPort(true);
+        browser.getSettings().setLoadWithOverviewMode(true);
+        browser.getSettings().setTextZoom(100);
+        browser.getSettings().setSupportZoom(false);
+        browser.getSettings().setBuiltInZoomControls(false);
+        browser.getSettings().setDisplayZoomControls(false);
+        browser.setInitialScale(0);
         browser.getSettings().setAllowFileAccess(false);
         browser.getSettings().setAllowContentAccess(false);
         browser.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
