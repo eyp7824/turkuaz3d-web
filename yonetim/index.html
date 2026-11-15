@@ -86,7 +86,7 @@ function preview(){try{el('preview').contentWindow.postMessage({type:'T3_PREVIEW
 document.querySelectorAll('#deviceTabs button').forEach(function(b){b.onclick=function(){data[device]=readFields();device=b.dataset.device;document.querySelectorAll('#deviceTabs button').forEach(function(x){x.classList.toggle('active',x===b)});fill()}});
 fields.forEach(function(k){el(k).addEventListener(k==='hideImage'?'change':'input',preview)});
 el('preview').addEventListener('load',preview);
-function utf8FromB64(s){var bytes=Uint8Array.from(atob(s.replace(/\\s/g,'')),function(c){return c.charCodeAt(0)});return new TextDecoder().decode(bytes)}
+function utf8FromB64(s){var bytes=Uint8Array.from(atob(s.replace(/\s/g,'')),function(c){return c.charCodeAt(0)});return new TextDecoder().decode(bytes)}
 function b64Utf8(s){return btoa(Array.from(new TextEncoder().encode(s),function(c){return String.fromCharCode(c)}).join(''))}
 function endpoint(){return 'https://api.github.com/repos/'+repo+'/contents/'+filePath}
 async function fetchSettings(withToken){
