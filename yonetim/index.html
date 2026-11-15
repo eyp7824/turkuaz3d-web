@@ -72,8 +72,39 @@ main,.shell,.card,.columns,.top,.flex{min-width:0}
   #preview.wide{width:100%;height:min(70dvh,650px)}
   #toast{font-size:14px}
 }
+
+/* Native Android always uses the phone dashboard layout, even in landscape.
+   The previous max-width media rule did not activate on wide rotated phones. */
+body.app-mobile{width:100%;max-width:100%;overflow-x:clip;font-size:16px}
+body.app-mobile header{display:flex;align-items:center;gap:10px;padding:8px 12px}
+body.app-mobile header .logo{height:38px;width:38px;flex:0 0 38px}
+body.app-mobile header>div{min-width:0;flex:1}
+body.app-mobile header h1{font-size:19px;line-height:1.15;overflow-wrap:anywhere}
+body.app-mobile header small{display:block;font-size:11px;overflow-wrap:anywhere}
+body.app-mobile .shell{display:block;width:100%;min-height:0}
+body.app-mobile nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;position:static;width:100%;padding:7px 9px;overflow:visible;border-right:0;border-bottom:1px solid var(--border)}
+body.app-mobile nav button{white-space:normal;line-height:1.15;min-width:0;text-align:center;padding:9px 4px;font-size:13px;min-height:43px;overflow-wrap:anywhere}
+body.app-mobile main{display:block;width:100%;max-width:100%;padding:12px;min-width:0}
+body.app-mobile .top{display:block;width:100%;min-width:0}
+body.app-mobile .top h2{font-size:22px;line-height:1.2}
+body.app-mobile .top .btn{display:inline-block;max-width:100%;margin-top:8px}
+body.app-mobile .cards{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:12px 0}
+body.app-mobile .card{min-width:0;width:100%;padding:14px;border-radius:14px;overflow-wrap:anywhere}
+body.app-mobile .card .number{font-size:25px}
+body.app-mobile .columns{display:flex;flex-direction:column;gap:12px;margin-top:12px;min-width:0}
+body.app-mobile .columns>.card{margin:0}
+body.app-mobile .flex{gap:8px;min-width:0}
+body.app-mobile .flex>.action,body.app-mobile .flex>.btn{flex:1 1 180px;text-align:center}
+body.app-mobile .toolbar{margin-top:10px}
+body.app-mobile input,body.app-mobile textarea,body.app-mobile select{max-width:100%;font-size:16px;padding:10px}
+body.app-mobile #frameWrap{width:100%;padding:7px;min-height:0;overflow:hidden}
+body.app-mobile #preview,body.app-mobile #preview.wide{display:block;width:390px;max-width:100%;height:min(68dvh,640px);margin:0 auto}
+@media(max-width:500px){
+ body.app-mobile nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.app-mobile header h1{font-size:18px}
+}
 </style></head>
-<body><header><img class="logo" alt="Turkuaz 3D logo" src="/assets/img/logo.svg"><div><h1>TURKUAZ <span>3D WEB</span></h1><small>Web sitesi yönetim merkezi · turkuaz3d.com</small></div></header>
+<body><script>if(new URLSearchParams(location.search).get('mode')==='android'){document.body.classList.add('app-mobile')}</script><header><img class="logo" alt="Turkuaz 3D logo" src="/assets/img/logo.svg"><div><h1>TURKUAZ <span>3D WEB</span></h1><small>Web sitesi yönetim merkezi · turkuaz3d.com</small></div></header>
 <div class="shell"><nav><button type="button" data-view="dashboard" class="selected">◈ Genel Bakış</button><button type="button" data-view="editor">✎ Tasarım Düzenle</button><button type="button" data-view="stats">▥ Ziyaretçi Trafiği</button><button type="button" data-view="account">⚙ GitHub Bağlantısı</button></nav>
 <main>
 <section id="dashboard">
