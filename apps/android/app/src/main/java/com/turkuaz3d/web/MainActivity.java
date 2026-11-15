@@ -13,6 +13,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -32,12 +34,20 @@ public class MainActivity extends Activity {
         browser.getSettings().setAllowContentAccess(false);
         browser.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         browser.setWebChromeClient(new WebChromeClient());
-        TextView loading = new TextView(this);
-        loading.setText("TURKUAZ 3D WEB\n\nYönetim paneli açılıyor...");
-        loading.setTextColor(Color.rgb(0,228,223));
-        loading.setTextSize(24);
+        LinearLayout loading = new LinearLayout(this);
+        loading.setOrientation(LinearLayout.VERTICAL);
         loading.setGravity(Gravity.CENTER);
         loading.setBackgroundColor(Color.rgb(6,24,36));
+        ImageView loadingLogo = new ImageView(this);
+        loadingLogo.setImageResource(R.drawable.t3_icon);
+        int logoSize=(int)(130 * getResources().getDisplayMetrics().density);
+        loading.addView(loadingLogo,new LinearLayout.LayoutParams(logoSize,logoSize));
+        TextView loadingText = new TextView(this);
+        loadingText.setText("TURKUAZ 3D WEB\n\nYönetim paneli açılıyor...");
+        loadingText.setTextColor(Color.rgb(0,228,223));
+        loadingText.setTextSize(24);
+        loadingText.setGravity(Gravity.CENTER);
+        loading.addView(loadingText, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         root.addView(browser, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         root.addView(loading, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         browser.setWebViewClient(new WebViewClient() {
