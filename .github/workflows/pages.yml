@@ -3,16 +3,13 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: "pages"
   cancel-in-progress: true
-
 jobs:
   deploy:
     environment:
@@ -20,13 +17,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout site
+      - name: Checkout website
         uses: actions/checkout@v4
-      - name: Prepare published files
+      - name: Prepare website
         run: |
           mkdir -p _site
-          cp index.html _site/index.html
-          cp CNAME _site/CNAME
+          cp index.html CNAME robots.txt sitemap.xml _site/
+          cp -R assets hizmetler _site/
+          cp gizlilik.html cerez.html kvkk.html _site/
       - name: Set up GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
