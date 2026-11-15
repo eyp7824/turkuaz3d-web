@@ -1,32 +1,61 @@
-# Turkuaz 3D – Arama Niyeti ve Yerel SEO Planı
+# Turkuaz 3D – SEO İyileştirme ve Google Takip Kaydı
 
-Güncelleme: 2026-11-15
+Güncelleme: 15 Kasım 2026
 
-Bu plan Google Ads hesabından çekilmiş arama hacmi verisi değildir. HYPD üzerinde Google Ads hesabı listelenmedi; anahtar kelime aracı hedef ülke alanında hata verdi. Buradaki gruplar Bursa pazarındaki yaygın hizmet ifadeleri ve müşteri arama niyeti esas alınarak hazırlandı. Reklam rekabeti, TBM, arama hacmi ve sıralama garanti edilmez.
+## Hedef
 
-| Öncelik | Anahtar kelime grubu | Hedef URL | Arama niyeti |
-| --- | --- | --- | --- |
-| 1 | bursa 3d baskı, 3d baskı bursa, bursa 3d baskı hizmeti | https://turkuaz3d.com/hizmetler/3d-baski/ | Hizmet/teklif |
-| 1 | bursa 3d modelleme, 3d tasarım bursa, 3d çizim hizmeti | https://turkuaz3d.com/hizmetler/3d-tasarim/ | Tasarım/teklif |
-| 1 | bursa prototip üretimi, 3d prototip, numune parça üretimi | https://turkuaz3d.com/hizmetler/prototip-uretimi/ | Örnek üretim |
-| 1 | bursa özel parça üretimi, 3d baskı özel parça, plastik aparat üretimi | https://turkuaz3d.com/hizmetler/ozel-parca-uretimi/ | Özel parça |
-| 2 | 3d baskı fiyatları, 3d yazıcı baskı siparişi, 3d baskı yaptırma | https://turkuaz3d.com/hizmetler/3d-baski/ | Fiyat/teklif |
-| 2 | teknik 3d çizim, CAD modelleme, 3d model hazırlama | https://turkuaz3d.com/hizmetler/3d-tasarim/ | Teknik ihtiyaç |
-| 2 | prototip 3d baskı, hızlı prototipleme, ürün geliştirme numunesi | https://turkuaz3d.com/hizmetler/prototip-uretimi/ | Prototip |
-| 2 | özel montaj aparatı, yedek plastik parça, bağlantı elemanı tasarımı | https://turkuaz3d.com/hizmetler/ozel-parca-uretimi/ | Özel üretim |
+Turkuaz 3D'nin Bursa merkezli yerel 3D baskı ve tasarım aramalarındaki görünürlüğünü korurken Türkiye genelinden gerçek proje talepleri için de bulunabilirliğini geliştirmek. Yalnızca gerçekten sunulan 3D baskı, teknik modelleme, prototip ve özel parça hizmetleri hedeflenir. Kesin kargo, süre, fiyat, malzeme ve ülke dışına gönderim taahhüt edilmez.
 
-## Yayımlanan teknik SEO
+## Google Search Console'dan gözlenen gerçek anahtar kelimeler
 
-- Türkçe, mobil uyumlu, HTTPS canonical adresleri
-- Beş ana sayfa için XML sitemap, robots.txt üzerinden keşif
-- 404 sayfasında noindex; yasal sayfalarda noindex,follow
-- Tekil title, description, H1, detay içeriği ve iç bağlantılar
-- Ana sayfada Organization + WebSite + WebPage JSON-LD
-- Hizmet sayfalarında Service + BreadcrumbList + WebPage JSON-LD
-- Google'ın zorunlu tuttuğu fiziksel işletme adresi doğrulanmadığı için LocalBusiness rich-result türü ve fiziksel adres uydurulmadı
+Kaynak: GSC'nin **eski** `https://www.turkuaz3d.com/` URL öneki mülkü; 1 Eylül – 12 Kasım 2026 tamamlanmış web arama verileri. Bu sayılar yeni sitenin sıralamalarını veya Google Ads Anahtar Kelime Planlayıcı hacimlerini göstermez.
 
-## Sonraki platform işlemleri
+| Sorgu | Gösterim | Tıklama | Hedef |
+| --- | ---: | ---: | --- |
+| bursa 3d yazıcı hizmeti | 80 | 9 | /hizmetler/3d-baski/ |
+| bursa 3d yazıcı | 154 | 6 | /hizmetler/3d-baski/ |
+| 3d baskı hizmeti | 49 | 3 | /hizmetler/3d-baski/ |
+| 3d yazıcı bursa | 70 | 3 | /hizmetler/3d-baski/ |
+| bursa 3d baskı | 146 | 2 | /hizmetler/3d-baski/ |
+| 3d baskı | 171 | 1 | /hizmetler/3d-baski/ |
+| 3d baskı bursa | 91 | 1 | /hizmetler/3d-baski/ |
+| 3d yazıcı | 357 | 1 | Bilgi odaklı ve geniş amaçlı; öncelik düşük |
 
-Google Search Console üzerinde görülen tek mülk https://www.turkuaz3d.com/ olup siteUnverifiedUser durumundadır. Google Search Console mülk sahibi doğrulaması yapılmadan sitemap gönderme, URL kaldırma ve URL denetleme işlemleri başarıyla uygulanamaz. Aynı alan adının eski arama geçmişini kaybetmemek için mülkü silmek önerilmez.
+GSC raporu ayrıca `3d baskı fiyatları`, `3d baskı yapan yerler`, `bursa 3d yazıcı yedek parça`, `3d modelleme` sorgularını gösteriyor. Bazılarının gösterimi çok azdır; yüksek arama hacmi iddiasında bulunulmaz.
 
-Google Ads ve Search Console ayrı ürünlerdir; AdSense, anahtar kelime planlayıcısı değildir. Hacim bilgilerini yalnızca Google Ads hesabı bağlanıp erişilebilir olduğunda gerçek veriden güncelle.
+## Sayfa ve anahtar kelime stratejisi
+
+| Sayfa | Ana odak | Destekleyici arama niyeti |
+| --- | --- | --- |
+| / | Bursa 3D baskı ve modelleme; Türkiye'den teklif talepleri | 3D yazıcı hizmeti, prototip ve özel parça |
+| /hizmetler/3d-baski/ | Bursa 3D baskı hizmeti | 3D baskı yaptırma, STL, fiyat teklifi, Türkiye geneli |
+| /hizmetler/3d-tasarim/ | 3D tasarım ve CAD modelleme | teknik çizim, 3D modelleme, özel parça tasarımı |
+| /hizmetler/prototip-uretimi/ | Prototip ve numune parça üretimi | 3D prototip, ürün geliştirme |
+| /hizmetler/ozel-parca-uretimi/ | Özel 3D parça üretimi | plastik yedek parça, aparat, ölçüye özel üretim |
+
+## 15 Kasım 2026'da yayıma gönderilen değişiklikler
+
+- Ana sayfanın H1 ve açıklama metinlerinde gerçek 3D hizmet anahtar kelimeleri öne çıkarıldı.
+- Ana sayfaya Bursa ile Türkiye genelindeki talep süreçlerini anlatan, diğer hizmetlere bağlantı içeren özgün bölüm eklendi.
+- Dört hizmet sayfasının her birine farklı müşteri ihtiyacına göre Türkiye genelinden talepleri anlatan özgün içerik eklendi.
+- Beş ana sayfada meta açıklamalar güçlendirildi; Open Graph açıklamaları eşleştirildi.
+- Dört hizmet sayfasındaki `Service.areaServed` yapılandırılmış verisine Bursa ile Türkiye eklendi (hizmet kapsamı için iletişim ve teklif değerlendirmesi bağlamında).
+- Eski 404 bağlantısına gelen kullanıcılar için mevcut dört hizmet sayfasına yönlendiren bağlantılar eklendi; 404 HTTP kodu ve noindex korunuyor.
+- Mevcut logo, tasarım, mobil menü, iletişim numarası, WhatsApp bağlantıları, kanonik HTTPS URL'leri ve Google sahiplik meta etiketi korunuyor.
+
+## Google Search Console / Google Ads durumu
+
+- Kullanıcının GSC ekran görüntülerinde hem `https://www.turkuaz3d.com/` hem `https://turkuaz3d.com/` için sahiplik doğrulandı.
+- Kullanıcı GSC arayüzünde eski www mülkündeki iki hatalı sitemap'i sildi; bağlantı aracı da eski mülkte 0 site haritası görüyor.
+- Kullanıcının yeni `https://turkuaz3d.com/` mülkü ekranında `https://turkuaz3d.com/sitemap.xml` **Başarılı**, **5 keşfedilen sayfa** gösterildi.
+- HYPD bağlantısının mevcut veri eşitlemesinde **yalnızca eski www mülkü ve siteUnverifiedUser** görünüyor; bu, kullanıcının güncel GSC arayüzündeki doğrulama ekranını geçersiz kılmaz. HYPD Search Console erişimi `webmasters.readonly` olduğundan Google'da doğrudan sitemap/URL kaldırma yazma işlemi çalıştırılamaz.
+- HYPD Google Ads entegrasyonu `ready` görünse de seçili hesaplar `[]`; Anahtar Kelime Planlayıcı'ndan hesap bazlı hacim, rekabet ve TBM verisi alınamadı. HYPD keyword research araç denemeleri hedef ülke/dil alanında sağlayıcı hatası döndürdü. Tahmini hacimler **uydurulmadı**.
+- AdSense ve Google Ads ayrı Google ürünleridir. Google Ads Anahtar Kelime Planlayıcı erişimi, uygun Ads hesabı ve erişimi gerektirir.
+
+## Teknik SEO kontrol noktaları
+
+- `https://turkuaz3d.com/` ana adres ve dört /hizmetler/ sayfası tekil canonical içeriyor.
+- `robots.txt` sitemap konumunu gösteriyor; XML sitemap beş güncel ana sayfayı listeliyor.
+- Var olmayan eski URL'ler 404 yanıtı vererek Google'ın zamanla indekslerinden çıkarmasına yardımcı oluyor.
+- Yeni sitemap'in başarıyla işlenmesi **tüm sayfaların dizine eklendiğini kanıtlamaz**. Google'ın canlı mülk raporunda sayfa düzeyinde tarama/dizin durumları tekrar kontrol edilmeli.
+- Bu kayıt sıralama, tıklama veya indeksleme garantisi vermez.
