@@ -30,7 +30,7 @@
  if(document.querySelector('#t3-consent'))return;
  const bar=document.createElement('aside');
  bar.id='t3-consent';bar.style.cssText='position:fixed;z-index:2147483640;bottom:8px;left:8px;right:8px;max-width:700px;margin:auto;background:#082d3d;color:#fff;border:1px solid #05c9c9;box-shadow:0 8px 30px #0007;border-radius:14px;padding:14px;font:14px system-ui';
- const msg=document.createElement('div');msg.textContent='Turkuaz 3D, site ziyaretlerini ve yaklaşık şehir/ülke bilgisini ölçmek istiyor. Onay verirseniz anonimleştirilmiş istatistikler kaydedilir.';bar.appendChild(msg);
+ const msg=document.createElement('div');msg.textContent='Turkuaz 3D, site ziyaretlerini ve yaklaşık şehir/ülke bilgisini ölçmek istiyor. Onay verirseniz takma kimlikli oturum istatistikleri kaydedilir.';bar.appendChild(msg);
  const buttons=document.createElement('div');buttons.style.cssText='display:flex;gap:9px;margin-top:11px;flex-wrap:wrap';
  for(const [label,value] of [['Kabul Et','yes'],['Reddet','no']]){
   const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='cursor:pointer;padding:9px 15px;border-radius:9px;border:0;background:'+(value==='yes'?'#00deda':'#42606c')+';color:'+(value==='yes'?'#002630':'white')+';font-weight:bold';
