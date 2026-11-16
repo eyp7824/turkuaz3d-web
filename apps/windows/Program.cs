@@ -129,7 +129,14 @@ sealed class TurkuazWindow : Form
     {
         try
         {
-            await view.EnsureCoreWebView2Async();
+            // Keep the WebView2 profile in the user's AppData, not next to the EXE.
+            // This preserves local settings whenever Windows app EXE is replaced or moved.
+            string profile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Turkuaz3DWeb", "WebView2");
+            Directory.CreateDirectory(profile);
+            var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: profile);
+            await view.EnsureCoreWebView2Async(environment);
             view.CoreWebView2.Settings.AreDevToolsEnabled = false;
             view.CoreWebView2.WebMessageReceived += (_,message) => {
                 // Only trust messages from our own protected administration origin.
