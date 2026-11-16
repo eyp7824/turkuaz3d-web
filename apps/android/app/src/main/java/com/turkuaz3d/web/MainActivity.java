@@ -8,6 +8,11 @@ import android.app.PendingIntent;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.webkit.JavascriptInterface;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
+import androidx.webkit.WebMessageCompat;
+import org.json.JSONObject;
+import java.util.Collections;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -55,6 +60,39 @@ public class MainActivity extends Activity {
         browser = new WebView(this);
         browser.setBackgroundColor(Color.rgb(6,24,36));
         browser.getSettings().setJavaScriptEnabled(true);
+        // This bridge only exists on the trusted first-party origin.
+        // A third-party iframe cannot read or overwrite stored secrets.
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(browser, "T3Vault",
+                Collections.singleton("https://turkuaz3d.com"),
+                (view, message, origin, mainFrame, reply) -> {
+                    if (!mainFrame || !"https://turkuaz3d.com".equals(origin.toString()) ||
+                        message.getType() != WebMessageCompat.TYPE_STRING) return;
+                    try {
+                        JSONObject input = new JSONObject(message.getData());
+                        if (!"t3-vault".equals(input.optString("type"))) return;
+                        String slot = input.optString("slot");
+                        String action = input.optString("action");
+                        JSONObject output = new JSONObject();
+                        output.put("type", "t3-vault-reply");
+                        output.put("id", input.optInt("id", 0));
+                        boolean ok = false;
+                        String value = "";
+                        if ("get".equals(action)) {
+                            value = NativeVault.read(this, slot);
+                            ok = true;
+                        } else if ("set".equals(action)) {
+                            ok = NativeVault.save(this, slot, input.optString("value"));
+                        } else if ("delete".equals(action)) {
+                            ok = NativeVault.clear(this, slot);
+                        }
+                        output.put("ok", ok);
+                        output.put("value", value);
+                        reply.postMessage(output.toString());
+                    } catch(Exception ignored) {}
+                });
+        }
+
         browser.addJavascriptInterface(new VisitorBridge(), "TurkuazNative");
         browser.getSettings().setDomStorageEnabled(true);
         browser.getSettings().setUseWideViewPort(true);
