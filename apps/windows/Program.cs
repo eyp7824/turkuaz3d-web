@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text;
+using System.Security.Cryptography;
 using System.Net.Http.Headers;
 using System.Drawing.Drawing2D;
 using Microsoft.Web.WebView2.WinForms;
@@ -139,12 +141,29 @@ sealed class TurkuazWindow : Form
             await view.EnsureCoreWebView2Async(environment);
             view.CoreWebView2.Settings.AreDevToolsEnabled = false;
             view.CoreWebView2.WebMessageReceived += (_,message) => {
-                // Only trust messages from our own protected administration origin.
                 if (!message.Source.StartsWith("https://turkuaz3d.com/yonetim/", StringComparison.OrdinalIgnoreCase)) return;
-                if (!Visible || WindowState == FormWindowState.Minimized) return; // Avoid duplicate tray notifications
                 try {
-                    using var doc = JsonDocument.Parse(message.WebMessageAsJson);
-                    if (!doc.RootElement.TryGetProperty("type",out var type) || type.GetString() != "new-visit") return;
+                    using var doc=JsonDocument.Parse(message.WebMessageAsJson);
+                    if (!doc.RootElement.TryGetProperty("type",out var type)) return;
+                    var kind=type.GetString();
+                    if(kind=="t3-vault") {
+                        var action=doc.RootElement.GetProperty("action").GetString() ?? "";
+                        var slot=doc.RootElement.GetProperty("slot").GetString() ?? "";
+                        var id=doc.RootElement.GetProperty("id").GetInt32();
+                        string value="";
+                        bool ok=false;
+                        switch(action) {
+                            case "get": value=CredentialVault.Read(slot); ok=true; break;
+                            case "set":
+                                value=doc.RootElement.GetProperty("value").GetString() ?? "";
+                                ok=CredentialVault.Save(slot,value); value=""; break;
+                            case "delete": ok=CredentialVault.Clear(slot); break;
+                        }
+                        view.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(
+                            new { type="t3-vault-reply", id, ok, value }));
+                        return;
+                    }
+                    if(kind!="new-visit" || !Visible || WindowState == FormWindowState.Minimized) return;
                     string title=doc.RootElement.TryGetProperty("title",out var t) ? (t.GetString()??"Turkuaz 3D") : "Turkuaz 3D";
                     string body=doc.RootElement.TryGetProperty("message",out var m) ? (m.GetString()??"Yeni ziyaret") : "Yeni ziyaret";
                     title=title[..Math.Min(title.Length,60)];body=body[..Math.Min(body.Length,220)];
@@ -172,5 +191,49 @@ sealed class TurkuazWindow : Form
             MessageBox.Show("Yönetim paneli açılamadı. Microsoft Edge WebView2 Runtime kurulu olmalı.\n"+ex.Message,
               "Turkuaz 3D Web",MessageBoxButtons.OK,MessageBoxIcon.Error);
         }
+    }
+}
+
+internal static class CredentialVault
+{
+    // Per-user Data Protection API encryption: no token is baked into the EXE or GitHub.
+    private static string? FileFor(string slot) => slot switch {
+        "github" => "github.bin",
+        "analytics" => "analytics.bin",
+        _ => null
+    };
+    private static string PathFor(string file) => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Turkuaz3DWeb", "Credentials", file);
+    internal static string Read(string slot) {
+        var file=FileFor(slot);
+        if(file==null) return "";
+        try {
+            var ciphertext=File.ReadAllBytes(PathFor(file));
+            return Encoding.UTF8.GetString(
+                ProtectedData.Unprotect(ciphertext,null,DataProtectionScope.CurrentUser));
+        } catch(Exception) {return "";}
+    }
+    internal static bool Save(string slot,string value) {
+        var file=FileFor(slot);
+        if(file==null || value==null || value.Length>2048)return false;
+        if(value.Length==0)return Clear(slot);
+        try {
+            var destination=PathFor(file);
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            var ciphertext=ProtectedData.Protect(
+                Encoding.UTF8.GetBytes(value),null,DataProtectionScope.CurrentUser);
+            File.WriteAllBytes(destination,ciphertext);
+            return true;
+        } catch(Exception) {return false;}
+    }
+    internal static bool Clear(string slot) {
+        var file=FileFor(slot);
+        if(file==null)return false;
+        try {
+            var destination=PathFor(file);
+            if(File.Exists(destination)) File.Delete(destination);
+            return true;
+        } catch(Exception) {return false;}
     }
 }
