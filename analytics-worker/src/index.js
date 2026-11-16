@@ -47,6 +47,7 @@ async function record(req, env, ctx) {
   const inserted=await env.DB.prepare('INSERT OR IGNORE INTO visits(id,started_at,last_seen_at,duration_seconds,country,city,page) VALUES(?,?,?,?,?,?,?)')
    .bind(id,now,now,duration,country,city,page).run();
   const fresh=(inserted.meta?.changes||0)>0;
+  await env.DB.prepare('INSERT OR IGNORE INTO pageviews(visitor_id,page,first_seen_at) VALUES(?,?,?)').bind(id,page,now).run();
   if (fresh) {
     await env.DB.prepare('INSERT INTO visit_events(visitor_id,created_at,country,city,page) VALUES(?,?,?,?,?)')
        .bind(id,now,country,city,page).run();
@@ -67,7 +68,7 @@ async function stats(env) {
  const [totals,cities,pages,latest,maxEvent]=await Promise.all([
   env.DB.prepare('SELECT SUM(CASE WHEN started_at>=? THEN 1 ELSE 0 END) AS today, SUM(CASE WHEN started_at>=? THEN 1 ELSE 0 END) AS week, SUM(CASE WHEN last_seen_at>=? THEN 1 ELSE 0 END) AS online, ROUND(AVG(CASE WHEN duration_seconds > 0 THEN duration_seconds END)) AS average_seconds FROM visits').bind(today,week,active).first(),
   env.DB.prepare('SELECT city,country,COUNT(*) AS visits FROM visits WHERE started_at>=? GROUP BY city,country ORDER BY visits DESC LIMIT 12').bind(week).all(),
-  env.DB.prepare('SELECT page,COUNT(*) AS visits FROM visits WHERE started_at>=? GROUP BY page ORDER BY visits DESC LIMIT 10').bind(week).all(),
+  env.DB.prepare('SELECT page,COUNT(*) AS visits FROM pageviews WHERE first_seen_at>=? GROUP BY page ORDER BY visits DESC LIMIT 10').bind(week).all(),
   env.DB.prepare('SELECT country,city,page,started_at,duration_seconds FROM visits ORDER BY started_at DESC LIMIT 20').all(),
   env.DB.prepare('SELECT COALESCE(MAX(id),0) AS id FROM visit_events').first()
  ]);
@@ -81,6 +82,15 @@ async function events(env, after) {
  return {events:rows.results||[],cursor:rows.results?.length?rows.results[rows.results.length-1].id:n};
 }
 export default {
+ async scheduled(event,env,ctx) {
+   if(!env.DB)return;
+   const old=Date.now()-90*86400000;
+   ctx.waitUntil(Promise.all([
+     env.DB.prepare('DELETE FROM pageviews WHERE first_seen_at<?').bind(old).run(),
+     env.DB.prepare('DELETE FROM visit_events WHERE created_at<?').bind(old).run(),
+     env.DB.prepare('DELETE FROM visits WHERE started_at<?').bind(old).run()
+   ]));
+ },
  async fetch(req,env,ctx) {
   const origin=req.headers.get('Origin')||'';
   const u=new URL(req.url), path=u.pathname;
