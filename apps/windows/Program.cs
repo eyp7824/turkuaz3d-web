@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Drawing.Drawing2D;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Core;
@@ -17,6 +18,8 @@ sealed class TurkuazWindow : Form
 {
     private readonly WebView2 view = new();
     private readonly Label status = new();
+    private readonly NotifyIcon tray = new();
+    private bool allowExit = false;
     private const string Url = "https://turkuaz3d.com/yonetim/?mode=windows";
 
     public TurkuazWindow()
@@ -50,15 +53,48 @@ sealed class TurkuazWindow : Form
         header.Controls.AddRange(new Control[]{logo,brand,status,site});
         view.Dock=DockStyle.Fill;
         Controls.Add(view);Controls.Add(header);
+        tray.Icon = SystemIcons.Information;
+        tray.Text = "Turkuaz 3D Web";
+        tray.Visible = true;
+        var context = new ContextMenuStrip();
+        context.Items.Add("Turkuaz 3D Web'i aç", null, (_,_) => { Show(); WindowState = FormWindowState.Normal; Activate(); });
+        context.Items.Add("Programdan çık", null, (_,_) => { allowExit = true; Close(); });
+        tray.ContextMenuStrip = context;
+        tray.DoubleClick += (_,_) => { Show(); WindowState = FormWindowState.Normal; Activate(); };
         Shown += async (_,_) => await LoadEditor();
     }
 
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        if (!allowExit && e.CloseReason == CloseReason.UserClosing) {
+            e.Cancel = true;
+            Hide(); // Keep the dashboard polling in the Windows tray.
+            tray.ShowBalloonTip(1500, "Turkuaz 3D Web", "Ziyaretçi takibi arka planda açık.", ToolTipIcon.Info);
+            return;
+        }
+        tray.Visible = false;
+        tray.Dispose();
+        base.OnFormClosing(e);
+    }
     private async Task LoadEditor()
     {
         try
         {
             await view.EnsureCoreWebView2Async();
             view.CoreWebView2.Settings.AreDevToolsEnabled = false;
+            view.CoreWebView2.WebMessageReceived += (_,message) => {
+                // Only trust messages from our own protected administration origin.
+                if (!message.Source.StartsWith("https://turkuaz3d.com/yonetim/", StringComparison.OrdinalIgnoreCase)) return;
+                try {
+                    using var doc = JsonDocument.Parse(message.WebMessageAsJson);
+                    if (!doc.RootElement.TryGetProperty("type",out var type) || type.GetString() != "new-visit") return;
+                    string title=doc.RootElement.TryGetProperty("title",out var t) ? (t.GetString()??"Turkuaz 3D") : "Turkuaz 3D";
+                    string body=doc.RootElement.TryGetProperty("message",out var m) ? (m.GetString()??"Yeni ziyaret") : "Yeni ziyaret";
+                    title=title[..Math.Min(title.Length,60)];body=body[..Math.Min(body.Length,220)];
+                    tray.BalloonTipTitle=title;tray.BalloonTipText=body;
+                    tray.ShowBalloonTip(6000);
+                    status.Text = "Son ziyaret: " + body;
+                } catch (Exception) {}
+            };
             view.CoreWebView2.NewWindowRequested += (_,args) => {
                 args.Handled=true;
                 if(Uri.TryCreate(args.Uri,UriKind.Absolute,out var target) && target.Scheme=="https")
