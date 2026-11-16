@@ -29,6 +29,54 @@ async function sendTelegram(env, visitor) {
   await fetch(url, {method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({chat_id:env.TELEGRAM_CHAT_ID,text})});
 }
+
+function encode64(bytes){let str='';for(const n of bytes)str+=String.fromCharCode(n);return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function json64(value){return encode64(new TextEncoder().encode(JSON.stringify(value)))}
+let googleAccess=null,googleExpires=0;
+async function fcmAccessToken(env){
+ if(googleAccess&&Date.now()<googleExpires)return googleAccess;
+ if(!env.FCM_CLIENT_EMAIL||!env.FCM_PRIVATE_KEY||!env.FCM_PROJECT_ID)return null;
+ const key=env.FCM_PRIVATE_KEY.replace(/\\n/g,'\n').replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s+/g,'');
+ const der=Uint8Array.from(atob(key),c=>c.charCodeAt(0));
+ const privateKey=await crypto.subtle.importKey('pkcs8',der,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
+ const ts=Math.floor(Date.now()/1000);
+ const assertion=json64({alg:'RS256',typ:'JWT'})+'.'+json64({iss:env.FCM_CLIENT_EMAIL,scope:'https://www.googleapis.com/auth/firebase.messaging',aud:'https://oauth2.googleapis.com/token',iat:ts,exp:ts+3500});
+ const signature=encode64(new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',privateKey,new TextEncoder().encode(assertion))));
+ const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:assertion+'.'+signature});
+ const res=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+ if(!res.ok)throw Error('Google OAuth '+res.status);
+ const data=await res.json();googleAccess=data.access_token;googleExpires=Date.now()+(Math.max(600,Number(data.expires_in)||3600)-90)*1000;
+ return googleAccess;
+}
+async function pushToPhones(env,visitor){
+ const access=await fcmAccessToken(env);if(!access)return;
+ const devices=(await env.DB.prepare('SELECT token FROM push_devices ORDER BY registered_at DESC LIMIT 20').all()).results||[];
+ const title='Turkuaz 3D Web · Yeni ziyaret';
+ const body=visitor.city+', '+visitor.country+' · '+visitor.page;
+ for(const d of devices){
+  try{
+   const result=await fetch('https://fcm.googleapis.com/v1/projects/'+encodeURIComponent(env.FCM_PROJECT_ID)+'/messages:send',{
+    method:'POST',headers:{'Authorization':'Bearer '+access,'Content-Type':'application/json'},
+    body:JSON.stringify({message:{token:d.token,notification:{title,body},android:{priority:'HIGH',notification:{channel_id:'turkuaz3d_visitors'}}}})
+   });
+   if(result.status===404||result.status===410){
+    await env.DB.prepare('DELETE FROM push_devices WHERE token=?').bind(d.token).run();
+   }
+  }catch{/* A failed push must not block visitor tracking. */}
+ }
+}
+async function pushRegistration(req,env){
+ const origin=req.headers.get('Origin')||'';
+ if(!allow(req)||!authed(req,env))return json({error:'Yetki reddedildi'},401,cors(origin));
+ if(!env.FCM_CLIENT_EMAIL||!env.FCM_PRIVATE_KEY||!env.FCM_PROJECT_ID)return json({error:'FCM sunucu ayarları henüz yapılandırılmadı'},503,cors(origin));
+ let data;
+ try{data=await req.json()}catch{return json({error:'JSON'},400,cors(origin))}
+ const token=String(data?.token||'');
+ if(!/^[\w.:_-]{30,512}$/.test(token))return json({error:'FCM token formatı geçersiz'},400,cors(origin));
+ await env.DB.prepare('INSERT INTO push_devices(token,registered_at) VALUES(?,?) ON CONFLICT(token) DO UPDATE SET registered_at=excluded.registered_at').bind(token,Date.now()).run();
+ return json({ok:true,push_ready:true},200,cors(origin));
+}
+
 async function record(req, env, ctx) {
   if (!allow(req)) return json({error:'origin'},403);
   const len = Number(req.headers.get('Content-Length')||0);
@@ -53,6 +101,9 @@ async function record(req, env, ctx) {
        .bind(id,now,country,city,page).run();
     if (ctx && env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
       ctx.waitUntil(sendTelegram(env,{time:now,country,city,page}).catch(()=>{}));
+    }
+    if(ctx && env.FCM_CLIENT_EMAIL && env.FCM_PRIVATE_KEY && env.FCM_PROJECT_ID) {
+      ctx.waitUntil(pushToPhones(env,{time:now,country,city,page}).catch(()=>{}));
     }
   } else {
     await env.DB.prepare('UPDATE visits SET last_seen_at=?, duration_seconds=MAX(duration_seconds,?), page=? WHERE id=?')
@@ -98,6 +149,7 @@ export default {
     if (!allow(req)) return new Response(null,{status:403});
     return new Response(null,{status:204,headers:cors(origin)});
   }
+  if (path==='/v1/push/register' && req.method==='POST') { try{return await pushRegistration(req,env)}catch{return json({error:'Kayıt yapılamadı'},500,cors(origin))} }
   if (path==='/health' && req.method==='GET') return json({ok:true,service:'Turkuaz 3D Analytics',deployed:true,db:!!env.DB});
   if (!env.DB) return json({error:'D1 bağlanmamış'},503,cors(origin));
   if (path==='/v1/visit' && req.method==='POST') {
