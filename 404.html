@@ -2,6 +2,45 @@
 <html lang="tr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,follow">
+<script>
+/* Recovery for URLs retained from the previous hosting provider.
+   Static GitHub Pages cannot issue HTTP 301 redirects: this is a
+   visitor-friendly fallback for legacy URLs that were not recreated. */
+(function () {
+  var path;
+  try {path=decodeURIComponent(location.pathname).toLocaleLowerCase('tr-TR');}
+  catch(e){path=location.pathname.toLowerCase();}
+  path=path.replace(/[ıİ]/g,'i').replace(/[şŞ]/g,'s').replace(/[ğĞ]/g,'g')
+    .replace(/[üÜ]/g,'u').replace(/[öÖ]/g,'o').replace(/[çÇ]/g,'c');
+  var target='';
+  if(/^\/(hizmet|hizmetler|blog|bolge|sayfa)\//.test(path)){
+    if(/(seri.uretim|eklemeli.imalat)/.test(path)){
+      target='/hizmetler/seri-uretim-3d-baski/';
+    }else if(/(siparis|online.3d|uygun.fiyat|fiyat)/.test(path)){
+      target='/hizmetler/3d-baski-siparisi/';
+    }else if(/(prototip|numune|fonksiyonel)/.test(path)){
+      target='/hizmetler/prototip-uretimi/';
+    }else if(/(disli|cark|kirik|yedek|parca|aparat|maket)/.test(path)){
+      target='/hizmetler/ozel-parca-uretimi/';
+    }else if(/(modelleme|3d.tasarim|cizim|endustriyel.tasarim|cad)/.test(path)){
+      target='/hizmetler/3d-tasarim/';
+    }else if(/^\/blog\//.test(path)){
+      target='/hizmetler/';
+    }else if(/^\/bolge\//.test(path)){
+      target='/hizmetler/3d-baski/';
+    }else if(/^\/sayfa\//.test(path)){
+      target=/(misyon|hakkimizda)/.test(path)?'/#hakkimizda':'/';
+    }else{
+      target='/hizmetler/';
+    }
+  }else if(/^\/(hakkimizda|misyonumuz)\/?$/.test(path)){
+    target='/#hakkimizda';
+  }else if(/^\/hizmetler?$/.test(path)){
+    target='/hizmetler/';
+  }
+  if(target)location.replace(target);
+})();
+</script>
 <title>Sayfa Bulunamadı | Turkuaz 3D</title>
 <style>*,*:before,*:after{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#061b29,#074452);font:18px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:#f5ffff;display:grid;place-items:center;padding:24px}main{max-width:560px;text-align:center}h1{font-size:clamp(34px,9vw,54px);line-height:1.12;margin:15px 0}strong{color:#12e3dc}p{color:#d9f0f2;font-size:19px}.brand{font-weight:900;font-size:22px;letter-spacing:.035em}.btn{display:inline-flex;background:#08d9d2;color:#03303d;padding:14px 23px;border-radius:12px;text-decoration:none;font-weight:800;font-size:18px;margin:18px 0;min-height:52px}.btn:focus-visible{outline:3px solid #fff;outline-offset:5px}nav{font-size:17px;line-height:2;margin:12px 0}nav a{color:#8df8f1;text-decoration:underline;text-underline-offset:3px}nav a:focus-visible{outline:3px solid #fff;outline-offset:3px}</style></head>
 <body><main><div class="brand">◇ TURKUAZ <strong>3D</strong></div><h1>Bu sayfa artık <strong>mevcut değil.</strong></h1><p>Eski web sitesine ait bir bağlantıyı açmış olabilirsiniz. Yeni Turkuaz 3D hizmetlerimize aşağıdan ulaşabilirsiniz.</p><nav aria-label="Güncel hizmet sayfaları"><a href="/hizmetler/3d-baski/">3D Baskı</a> · <a href="/hizmetler/3d-tasarim/">3D Tasarım</a> · <a href="/hizmetler/prototip-uretimi/">Prototip Üretimi</a> · <a href="/hizmetler/ozel-parca-uretimi/">Özel Parça Üretimi</a></nav><a class="btn" href="/">Yeni Turkuaz 3D Ana Sayfasına Git ↗</a></main></body></html>
