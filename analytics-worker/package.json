@@ -1,0 +1,27 @@
+{
+  "name": "turkuaz3d-analytics",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Turkuaz 3D Web ücretsiz ziyaretçi istatistikleri ve bildirimler",
+  "scripts": {
+    "deploy": "npm run db:migrate && wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply DB --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "ADMIN_KEY": {
+        "description": "Turkuaz 3D Web yönetim ekranını koruyacak, bu projeye özel en az 32 karakterlik rastgele gizli anahtar. Oluşturduğunuz değeri sadece Cloudflare Worker secret olarak ve kendi Turkuaz 3D Web uygulamanıza girin. Bu kodu GitHub'a veya sohbete koymayın."
+      },
+      "TELEGRAM_BOT_TOKEN": {
+        "description": "İSTEĞE BAĞLI: Telegram botunuzun belirteci. Uygulama kapalıyken telefon/Windows Telegram bildirimi için."
+      },
+      "TELEGRAM_CHAT_ID": {
+        "description": "İSTEĞE BAĞLI: Telegram hesabınızın/sohbetinizin kimliği."
+      }
+    }
+  }
+}
