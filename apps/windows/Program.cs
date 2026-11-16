@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Net.Http.Headers;
 using System.Drawing.Drawing2D;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Core;
@@ -20,6 +21,10 @@ sealed class TurkuazWindow : Form
     private readonly Label status = new();
     private readonly NotifyIcon tray = new();
     private bool allowExit = false;
+    private readonly System.Windows.Forms.Timer backgroundTimer = new() { Interval = 12000 };
+    private readonly HttpClient visitorClient = new() { Timeout = TimeSpan.FromSeconds(8) };
+    private bool checkingBackground = false;
+    private long backgroundCursor = -1;
     private const string Url = "https://turkuaz3d.com/yonetim/?mode=windows";
 
     public TurkuazWindow()
@@ -61,6 +66,8 @@ sealed class TurkuazWindow : Form
         context.Items.Add("Programdan çık", null, (_,_) => { allowExit = true; Close(); });
         tray.ContextMenuStrip = context;
         tray.DoubleClick += (_,_) => { Show(); WindowState = FormWindowState.Normal; Activate(); };
+        backgroundTimer.Tick += async (_,_) => await CheckBackgroundVisits();
+        backgroundTimer.Start();
         Shown += async (_,_) => await LoadEditor();
     }
 
@@ -71,10 +78,52 @@ sealed class TurkuazWindow : Form
             tray.ShowBalloonTip(1500, "Turkuaz 3D Web", "Ziyaretçi takibi arka planda açık.", ToolTipIcon.Info);
             return;
         }
+        backgroundTimer.Stop();
+        backgroundTimer.Dispose();
+        visitorClient.Dispose();
         tray.Visible = false;
         tray.Dispose();
         base.OnFormClosing(e);
     }
+    private async Task CheckBackgroundVisits() {
+        if (checkingBackground || view.CoreWebView2 == null ||
+            (Visible && WindowState != FormWindowState.Minimized)) return;
+        checkingBackground = true;
+        try {
+            // The access key stays in this computer's WebView profile and is sent
+            // only to the trusted owner's configured Cloudflare endpoint.
+            string js = await view.CoreWebView2.ExecuteScriptAsync(
+                "JSON.stringify({worker:localStorage.getItem('t3-analytics-worker'),key:localStorage.getItem('t3-analytics-access')})");
+            string config = JsonSerializer.Deserialize<string>(js) ?? "{}";
+            using var doc = JsonDocument.Parse(config);
+            string endpoint = doc.RootElement.GetProperty("worker").GetString() ?? "";
+            string key = doc.RootElement.GetProperty("key").GetString() ?? "";
+            if (!Uri.TryCreate(endpoint,UriKind.Absolute,out var service) ||
+                service.Scheme != "https" || key.Length < 32) return;
+            string route=backgroundCursor < 0 ? "/v1/stats" : "/v1/events?after="+backgroundCursor;
+            using var request = new HttpRequestMessage(HttpMethod.Get,endpoint.TrimEnd('/')+route);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",key);
+            using var response = await visitorClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return;
+            using var reply=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            if (backgroundCursor < 0) {
+                backgroundCursor=reply.RootElement.TryGetProperty("cursor",out var c) ? c.GetInt64() : 0;
+                return;
+            }
+            if (!reply.RootElement.TryGetProperty("events",out var events)) return;
+            foreach(var visitor in events.EnumerateArray()) {
+                long id=visitor.GetProperty("id").GetInt64();
+                if(id<=backgroundCursor)continue;
+                backgroundCursor=id;
+                string city=visitor.GetProperty("city").GetString()??"Bilinmiyor";
+                string country=visitor.GetProperty("country").GetString()??"Bilinmiyor";
+                string page=visitor.GetProperty("page").GetString()??"/";
+                tray.ShowBalloonTip(4000,"Turkuaz 3D Web · Yeni ziyaret",
+                    (city+", "+country+" · "+page)[..Math.Min(180,(city+", "+country+" · "+page).Length)],ToolTipIcon.Info);
+            }
+        } catch (Exception) {} finally {checkingBackground=false;}
+    }
+
     private async Task LoadEditor()
     {
         try
