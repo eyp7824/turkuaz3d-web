@@ -2,6 +2,9 @@
 import {readFileSync} from 'node:fs';
 const pages=[
 ['index.html','https://turkuaz3d.com/'],
+['hizmetler/index.html','https://turkuaz3d.com/hizmetler/'],
+['hizmetler/3d-baski-siparisi/index.html','https://turkuaz3d.com/hizmetler/3d-baski-siparisi/'],
+['hizmetler/seri-uretim-3d-baski/index.html','https://turkuaz3d.com/hizmetler/seri-uretim-3d-baski/'],
 ['hizmetler/3d-baski/index.html','https://turkuaz3d.com/hizmetler/3d-baski/'],
 ['hizmetler/3d-tasarim/index.html','https://turkuaz3d.com/hizmetler/3d-tasarim/'],
 ['hizmetler/prototip-uretimi/index.html','https://turkuaz3d.com/hizmetler/prototip-uretimi/'],
@@ -38,6 +41,6 @@ for(const [p,canonical] of pages){
  console.log('SEO:',p,'title='+title,'description='+description.length+' chars');
 }
 add(robot.includes('Sitemap: https://turkuaz3d.com/sitemap.xml'),'robots.txt: sitemap missing');
-add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly 5 SEO pages');
+add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly the 8 canonical SEO pages');
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log('PASS: All 5 pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
+console.log('PASS: All 8 pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
