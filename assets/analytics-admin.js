@@ -4,7 +4,9 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const DB_URL='t3-analytics-worker',DB_KEY='t3-analytics-access';
-let worker=localStorage.getItem(DB_URL)||'',key=localStorage.getItem(DB_KEY)||'';
+const DEFAULT_WORKER='https://turkuaz3d-analytics.eyupbozkurt1316.workers.dev';
+let worker=localStorage.getItem(DB_URL)||DEFAULT_WORKER,key=localStorage.getItem(DB_KEY)||'';
+if(!localStorage.getItem(DB_URL))localStorage.setItem(DB_URL,worker);
 let cursor=null, timer=null, loading=false, lastError='', trackingEnabled=false;
 const set=(id,value)=>{if($(id))$(id).textContent=String(value)};
 const clearRows=id=>{if($(id))$(id).replaceChildren()};
@@ -118,6 +120,10 @@ async function connect(){
  if(!urlOk(next)){status('HTTPS ile başlayan geçerli Cloudflare Worker adresi gerekiyor.');return}
  if(nextKey.length<32){status('Analitik anahtarı en az 32 karakter olmalı.');return}
  worker=next;key=nextKey;cursor=null;
+ // Persist the owner's settings BEFORE making a network request. Temporary failures
+ // must not force the user to retype the secret on the next app launch.
+ localStorage.setItem(DB_URL,worker);
+ localStorage.setItem(DB_KEY,key);
  try{
   const response=await api('/v1/stats');
   if(!response||response.connected!==true)throw Error('Sunucu geçersiz');
@@ -127,7 +133,9 @@ async function connect(){
   await checkSiteTracking();
   render(response);
   cursor=Number(response.cursor)||0;
- }catch(e){status('Bağlantı kurulamadı: '+e.message)}
+ }catch(e){
+   status('Bağlantı kontrol edilemedi: '+e.message+'. Kayıtlı bilgiler silinmedi, bağlantı otomatik yeniden denenecek.');
+ }
 }
 $('analyticsConnect')?.addEventListener('click',connect);
 $('analyticsNotify')?.addEventListener('click',()=>{
@@ -142,13 +150,12 @@ $('analyticsNotify')?.addEventListener('click',()=>{
  }else set('analyticsConnection','Bu tarayıcı yerel bildirim iznini desteklemiyor.');
 });
 if(worker)$('analyticsWorker').value=worker;
-if(key){$('analyticsKey').value=key;refresh()}
-else {
- fetch('/public/analytics-config.json',{cache:'no-store'}).then(r=>r.json()).then(j=>{
-  if(j.enabled&&urlOk(j.worker)&&!$('analyticsWorker').value){
-   $('analyticsWorker').value=j.worker;set('analyticsConnection','Sunucu adresi bulundu; analitik erişim anahtarını gir.');
-  }
- }).catch(()=>{});
+if(key){
+ // Restore the existing authorization silently without making the user click Connect.
+ $('analyticsKey').value='';
+ refresh();
+}else{
+ set('analyticsConnection','Sunucu adresi otomatik bulundu. Bu cihazda henüz yetkili giriş kaydı yok.');
 }
 timer=setInterval(refresh,12000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
