@@ -25,7 +25,7 @@ sealed class TurkuazWindow : Form
     private readonly HttpClient visitorClient = new() { Timeout = TimeSpan.FromSeconds(8) };
     private bool checkingBackground = false;
     private long backgroundCursor = -1;
-    private const string Url = "https://turkuaz3d.com/yonetim/?mode=windows";
+    private const string Url = "https://turkuaz3d.com/yonetim/?mode=windows&view=stats";
 
     public TurkuazWindow()
     {
