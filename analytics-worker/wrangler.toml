@@ -9,3 +9,7 @@ binding = "DB"
 database_name = "turkuaz3d-analytics"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
 migrations_dir = "migrations"
+
+# Automatic 90-day analytics retention
+[triggers]
+crons = ["0 2 * * *"]
