@@ -66,8 +66,15 @@ public class MainActivity extends Activity {
             WebViewCompat.addWebMessageListener(browser, "T3Vault",
                 Collections.singleton("https://turkuaz3d.com"),
                 (view, message, origin, mainFrame, reply) -> {
-                    if (!mainFrame || !"https://turkuaz3d.com".equals(origin.toString()) ||
+                    if (!mainFrame || !"https".equals(origin.getScheme()) ||
+                        !"turkuaz3d.com".equals(origin.getHost()) ||
+                        (origin.getPort() != -1 && origin.getPort() != 443) ||
                         message.getType() != WebMessageCompat.TYPE_STRING) return;
+                    Uri current = Uri.parse(view.getUrl() == null ? "" : view.getUrl());
+                    if (!"https".equals(current.getScheme()) ||
+                        !"turkuaz3d.com".equals(current.getHost()) ||
+                        current.getPath() == null ||
+                        !current.getPath().startsWith("/yonetim/")) return;
                     try {
                         JSONObject input = new JSONObject(message.getData());
                         if (!"t3-vault".equals(input.optString("type"))) return;
@@ -102,8 +109,8 @@ public class MainActivity extends Activity {
         browser.getSettings().setBuiltInZoomControls(false);
         browser.getSettings().setDisplayZoomControls(false);
         browser.setInitialScale(100);
-        browser.getSettings().setCacheMode(android.webkit.WebSettings.LOAD_NO_CACHE);
-        browser.clearCache(true);
+        browser.getSettings().setCacheMode(android.webkit.WebSettings.LOAD_DEFAULT);
+        // Preserve WebView profile, localStorage and cache when the app is reopened.
         browser.getSettings().setAllowFileAccess(false);
         browser.getSettings().setAllowContentAccess(false);
         browser.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
