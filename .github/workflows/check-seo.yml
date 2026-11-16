@@ -1,0 +1,24 @@
+name: Check Turkuaz 3D SEO
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'hizmetler/**'
+      - 'sitemap.xml'
+      - 'robots.txt'
+      - 'tools/seo-check.mjs'
+      - '.github/workflows/check-seo.yml'
+permissions:
+  contents: read
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all public SEO metadata
+        run: node tools/seo-check.mjs
