@@ -103,6 +103,7 @@ sealed class TurkuazWindow : Form
             string route=backgroundCursor < 0 ? "/v1/stats" : "/v1/events?after="+backgroundCursor;
             using var request = new HttpRequestMessage(HttpMethod.Get,endpoint.TrimEnd('/')+route);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",key);
+            request.Headers.TryAddWithoutValidation("Origin","https://turkuaz3d.com");
             using var response = await visitorClient.SendAsync(request);
             if (!response.IsSuccessStatusCode) return;
             using var reply=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -133,6 +134,7 @@ sealed class TurkuazWindow : Form
             view.CoreWebView2.WebMessageReceived += (_,message) => {
                 // Only trust messages from our own protected administration origin.
                 if (!message.Source.StartsWith("https://turkuaz3d.com/yonetim/", StringComparison.OrdinalIgnoreCase)) return;
+                if (!Visible || WindowState == FormWindowState.Minimized) return; // Avoid duplicate tray notifications
                 try {
                     using var doc = JsonDocument.Parse(message.WebMessageAsJson);
                     if (!doc.RootElement.TryGetProperty("type",out var type) || type.GetString() != "new-visit") return;
