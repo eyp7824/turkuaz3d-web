@@ -1,0 +1,48 @@
+name: Validate Turkuaz 3D analytics
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'analytics-worker/**'
+      - 'assets/analytics-admin.js'
+      - 'assets/visit-tracker.js'
+      - '.github/workflows/validate-analytics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JavaScript syntax
+        run: |
+          node --check analytics-worker/src/index.js
+          node --check assets/analytics-admin.js
+          node --check assets/visit-tracker.js
+      - name: Verify database migration
+        run: |
+          python - <<'PY'
+          import sqlite3
+          p='analytics-worker/migrations/0001_initial.sql'
+          db=sqlite3.connect(':memory:')
+          with open(p,encoding='utf8') as f: db.executescript(f.read())
+          tables={x[0] for x in db.execute("select name from sqlite_master where type='table'")}
+          assert {'visits','visit_events','pageviews'} <= tables,tables
+          print('SQL schema verified:',sorted(tables))
+          PY
+      - name: Verify statically configured frontend
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          data=json.loads(pathlib.Path('public/analytics-config.json').read_text())
+          assert data['enabled'] is False, 'Do not expose tracker before backend is deployed'
+          assert not data['worker'], 'Do not invent a Worker URL'
+          admin=pathlib.Path('yonetim/index.html').read_text()
+          assert 'assets/analytics-admin.js' in admin
+          assert "localStorage.getItem('t3-session-token')" in admin
+          print('Frontend integration valid; pending external Worker activation')
+          PY
