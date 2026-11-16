@@ -11,7 +11,8 @@
  const key='t3-analytics-consent';
  function start() {
   if (!sessionStorage.getItem('t3-visit-id')) sessionStorage.setItem('t3-visit-id',crypto.randomUUID().replace(/-/g,''));
-  const id=sessionStorage.getItem('t3-visit-id'), started=Date.now();
+  if (!sessionStorage.getItem('t3-visit-started')) sessionStorage.setItem('t3-visit-started',String(Date.now()));
+  const id=sessionStorage.getItem('t3-visit-id'), started=Number(sessionStorage.getItem('t3-visit-started'))||Date.now();
   function send(kind){
     const payload=JSON.stringify({id,path:location.pathname,kind,duration:Math.floor((Date.now()-started)/1000)});
     try{
