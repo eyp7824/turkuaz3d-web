@@ -32,7 +32,7 @@
       try {
         channel.postMessage(JSON.stringify({type:'t3-vault',action,slot,id,value:value || ''}));
       } catch (_) {
-        pending.delete(id); resolve('');
+        pending.delete(id); resolve({ok:false,value:''});
       }
     });
   }
