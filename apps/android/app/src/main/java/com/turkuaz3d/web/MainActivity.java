@@ -1,6 +1,13 @@
 package com.turkuaz3d.web;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.webkit.JavascriptInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -21,8 +28,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=5";
+    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=6";
     private WebView browser;
+    private static final String VISIT_CHANNEL = "turkuaz3d_visitors";
+    private int notificationId = 100;
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setStatusBarColor(Color.rgb(4,26,39));
@@ -46,6 +55,7 @@ public class MainActivity extends Activity {
         browser = new WebView(this);
         browser.setBackgroundColor(Color.rgb(6,24,36));
         browser.getSettings().setJavaScriptEnabled(true);
+        browser.addJavascriptInterface(new VisitorBridge(), "TurkuazNative");
         browser.getSettings().setDomStorageEnabled(true);
         browser.getSettings().setUseWideViewPort(true);
         browser.getSettings().setLoadWithOverviewMode(false);
@@ -91,9 +101,47 @@ public class MainActivity extends Activity {
                 loading.setVisibility(View.GONE);
             }
         });
+        NotificationManager notifications = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        if (notifications != null) {
+            NotificationChannel channel = new NotificationChannel(VISIT_CHANNEL, "Turkuaz 3D ziyaretçi bildirimleri", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Web sitesine yeni ziyaret geldiğinde bildirim verir (uygulama açıkken).");
+            notifications.createNotificationChannel(channel);
+        }
         setContentView(root);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) root.requestApplyInsets();
         browser.loadUrl(HOME);
+    }
+    public class VisitorBridge {
+        @JavascriptInterface public void enableNotifications() {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+                } else {
+                    android.widget.Toast.makeText(MainActivity.this,
+                        "Turkuaz 3D ziyaretçi bildirimleri açık (uygulama çalışırken)",
+                        android.widget.Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        @JavascriptInterface public void showNotification(String title, String message) {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
+                NotificationManager nm=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                if(nm==null) return;
+                Intent intent=new Intent(MainActivity.this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent tap=PendingIntent.getActivity(MainActivity.this,0,intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                Notification n=new Notification.Builder(MainActivity.this,VISIT_CHANNEL)
+                    .setSmallIcon(R.drawable.t3_icon)
+                    .setContentTitle(title==null?"Turkuaz 3D Web":title.substring(0,Math.min(70,title.length())))
+                    .setContentText(message==null?"Yeni ziyaret":message.substring(0,Math.min(150,message.length())))
+                    .setAutoCancel(true).setContentIntent(tap).build();
+                nm.notify(++notificationId,n);
+            });
+        }
     }
     @Override public void onBackPressed() {
         if(browser!=null && browser.canGoBack()) browser.goBack();
