@@ -61,8 +61,7 @@ async function record(req, env, ctx) {
 }
 async function stats(env) {
  const now=Date.now();
- const dayStart=new Date();dayStart.setUTCHours(0,0,0,0);
- const today=dayStart.getTime();
+ const today=(Math.floor((now+3*60*60*1000)/(24*60*60*1000))*(24*60*60*1000))-(3*60*60*1000);
  const week=now-7*24*60*60*1000;
  const active=now-90*1000;
  const [totals,cities,pages,latest,maxEvent]=await Promise.all([
