@@ -99,6 +99,12 @@ public class MainActivity extends Activity {
             @Override public void onPageFinished(WebView view, String url) {
                 view.evaluateJavascript("window.scrollTo(0,0);", null);
                 loading.setVisibility(View.GONE);
+                // Refresh FCM registration after app relaunch; Android may rotate the token.
+                if (!getSharedPreferences("turkuaz_push_config", MODE_PRIVATE).getString("firebase","").isEmpty()
+                    && (Build.VERSION.SDK_INT < 33 ||
+                        checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED)) {
+                    prepareRemoteNotifications();
+                }
             }
         });
         NotificationManager notifications = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
