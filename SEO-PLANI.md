@@ -59,3 +59,12 @@ GSC raporu ayrıca `3d baskı fiyatları`, `3d baskı yapan yerler`, `bursa 3d y
 - Var olmayan eski URL'ler 404 yanıtı vererek Google'ın zamanla indekslerinden çıkarmasına yardımcı oluyor.
 - Yeni sitemap'in başarıyla işlenmesi **tüm sayfaların dizine eklendiğini kanıtlamaz**. Google'ın canlı mülk raporunda sayfa düzeyinde tarama/dizin durumları tekrar kontrol edilmeli.
 - Bu kayıt sıralama, tıklama veya indeksleme garantisi vermez.
+
+
+## 16 Kasım 2026: Yenilenen SEO başlıkları
+
+Gerçek GSC sorguları (eski www mülkü, 1 Eylül - 12 Kasım 2026): bursa 3d yazıcı (154 gösterim, 6 tıklama), bursa 3d baskı (146 gösterim, 2 tıklama), bursa 3d yazıcı hizmeti (80 gösterim, 9 tıklama), 3d yazıcı plastik parça üretimi bursa (25 gösterim, 0 tıklama).
+
+SEO title / meta description / Open Graph / Twitter meta alanları beş sayfada özelleştirildi. Sayfalara 3D yazıcı hizmeti, STL ile baskı yaptırma, CAD çizim, prototip, plastik yedek parça ve aparat üretimi hakkında ek faydalı metinler eklendi. Sitemap tarihleri 16 Kasım 2026 yapıldı. Otomatik SEO doğrulaması GitHub Actions üzerinden başarıyla geçti.
+
+Google, meta keywords etiketini sıralama için kullanmaz; bu nedenle anahtar kelime yığılması yapılmadı. GSC bağlantısında yalnızca eski www mülkü mevcut olduğundan yeni canonical alan adının indeks durumu buradan henüz doğrulanamıyor. Google AdSense ile Google Ads Keyword Planner farklı hizmetlerdir; ücretli hizmet kurulmadı.
