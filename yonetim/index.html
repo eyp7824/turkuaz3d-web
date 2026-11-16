@@ -103,16 +103,16 @@ body.app-mobile #preview,body.app-mobile #preview.wide{display:block;width:390px
  body.app-mobile nav{grid-template-columns:repeat(2,minmax(0,1fr))}
  body.app-mobile header h1{font-size:18px}
 }
-</style></head>
+ .live-tables{display:grid;gap:12px}.live-tables h3{margin:10px 0 0}.live-data-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 3px;border-bottom:1px solid var(--border);overflow-wrap:anywhere}.live-data-row span{min-width:0;flex:1}.live-data-row strong{white-space:nowrap} </style></head>
 <body><script>if(new URLSearchParams(location.search).get('mode')==='android'){document.body.classList.add('app-mobile')}</script><header><img class="logo" alt="Turkuaz 3D logo" src="/assets/img/logo.svg"><div><h1>TURKUAZ <span>3D WEB</span></h1><small>Web sitesi yönetim merkezi · turkuaz3d.com</small></div></header>
 <div class="shell"><nav><button type="button" data-view="dashboard" class="selected">◈ Genel Bakış</button><button type="button" data-view="editor">✎ Tasarım Düzenle</button><button type="button" data-view="stats">▥ Ziyaretçi Trafiği</button><button type="button" data-view="account">⚙ GitHub Bağlantısı</button></nav>
 <main>
 <section id="dashboard">
 <div class="top"><div><span class="tag">TURKUAZ 3D · YÖNETİM</span><h2>Web siten senin kontrolünde</h2><p>Telefon uygulamasında mobil görünümü, bilgisayarda ise mobil ve masaüstü görünümünü düzenle.</p></div><a class="btn secondary" target="_blank" rel="noopener" href="https://turkuaz3d.com/">Siteyi Aç ↗</a></div>
-<div class="cards"><div class="card"><small>Bugünkü ziyaretçi</small><div class="number">—</div><small>Ölçüm hizmeti bağlanmadı</small></div>
-<div class="card"><small>Şehir / ülke dağılımı</small><div class="number">—</div><small>Gerçek veriler için analitik bağlantısı gerekli</small></div>
-<div class="card"><small>Anlık ziyaret bildirimi</small><div class="number" style="font-size:19px">Bağlı değil</div><small>Bildirim sunucusu henüz kurulmadı</small></div></div>
-<div class="card"><h3>Hızlı işlemler</h3><div class="flex"><button class="action" id="quickEdit">Mobil Tasarımı Aç</button><a class="btn secondary" href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console ↗</a></div><p>Değişiklikleri yayınlamak için yalnızca Turkuaz 3D GitHub deposuna erişim izni olan hesabın belirteci gerekir. Belirteç sunucumuza gönderilmez ve cihazın oturumu kapatılınca silinir.</p></div>
+<div class="cards"><div class="card"><small>Bugünkü ziyaretçi</small><div class="number" id="visitToday">—</div><small id="visitTodayStatus">Analitik bağlantısı bekleniyor</small></div>
+<div class="card"><small>Şehir / ülke dağılımı</small><div class="number" id="visitCity">—</div><small id="visitCityStatus">Gerçek ziyaretlerden hesaplanır</small></div>
+<div class="card"><small>Anlık ziyaret bildirimi</small><div class="number" style="font-size:19px" id="notifyStatus">Bağlı değil</div><small id="notifyDesc">Analitik Worker kurulumu bekleniyor</small></div></div>
+<div class="card"><h3>Hızlı işlemler</h3><div class="flex"><button class="action" id="quickEdit">Mobil Tasarımı Aç</button><a class="btn secondary" href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console ↗</a></div><p>Değişiklikleri yayınlamak için yalnızca Turkuaz 3D GitHub deposuna erişim izni olan hesabın belirteci gerekir. Belirteç GitHub dışında bir sunucuya gönderilmez; oturumu kapatana veya uygulamayı kaldırana kadar bu cihazda saklanır. Ortak cihazlarda kullanma.</p></div>
 </section>
 <section id="editor" class="hidden"><div class="top"><div><span class="tag">GÖRSEL EDİTÖR</span><h2>Site tasarımını değiştir</h2><p>Önizle; beğendiğinde GitHub üzerinden yayınla.</p></div><div class="toolbar" id="deviceTabs"><button class="active" type="button" data-device="mobile">📱 Mobil</button><button type="button" data-device="desktop">▣ Masaüstü</button></div></div>
 <div class="columns"><div class="card"><h3 id="editTitle">Mobil görünüm ayarları</h3>
@@ -127,8 +127,14 @@ body.app-mobile #preview,body.app-mobile #preview.wide{display:block;width:390px
 <div><div id="frameWrap"><iframe id="preview" title="Turkuaz 3D canlı önizleme" src="https://turkuaz3d.com/"></iframe></div><p>Önizleme mevcut siteni gösterir. Değişiklikleri uygulama anında burada görebilirsin.</p></div></div>
 </section>
 <section id="stats" class="hidden"><span class="tag bad">BAĞLANTI GEREKLİ</span><h2>Ziyaretçi trafiği</h2>
-<div class="cards"><div class="card"><small>Canlı ziyaretçiler</small><div class="number">—</div></div><div class="card"><small>Ziyaret edilen şehirler</small><div class="number">—</div></div><div class="card"><small>Ortalama ziyaret süresi</small><div class="number">—</div></div></div>
-<div class="card"><h3>Veri durumu</h3><p>Web sitesinde henüz ziyaret olaylarını kaydeden ve uygulamaya ileten bir analiz sunucusu bağlı değil. Bu yüzden ziyaretçi sayısı, IP veya şehir bilgisi uydurulmaz. Ücretsiz analitik altyapısı kurulduğunda burada gerçek veriler açılacak.</p><p>Anlık telefon bildirimleri de bildirim servisinin bağlanmasını gerektirir.</p></div></section>
+<div class="cards"><div class="card"><small>Canlı ziyaretçiler</small><div class="number" id="onlineNow">—</div></div><div class="card"><small>Son 7 gün</small><div class="number" id="weeklyVisits">—</div></div><div class="card"><small>Ortalama ziyaret süresi</small><div class="number" id="avgDuration">—</div></div></div>
+<div class="card"><h3>Canlı ziyaret bilgileri</h3><p id="analyticsMessage">Cloudflare ziyaretçi sunucusu henüz bağlanmadı. Veriler canlı bağlandıktan sonra görünecek.</p><div id="visitorTables" class="live-tables hidden"><h3>En çok ziyaret eden şehirler</h3><div id="cityTable"></div><h3>En çok görüntülenen sayfalar</h3><div id="pageTable"></div><h3>Son ziyaretler</h3><div id="recentTable"></div></div></div>
+<div class="card" style="margin-top:15px"><h3>Canlı trafik bağlantısı</h3>
+<p>Cloudflare Worker ve D1 kurulduktan sonra aşağıdaki alanları bir defa doldur. Veriler bu telefonda veya bilgisayarda saklanır. Yeni bir GitHub tokenı gerekmiyor.</p>
+<label for="analyticsWorker">Worker sunucu adresi</label><input id="analyticsWorker" inputmode="url" placeholder="https://turkuaz3d-analytics....workers.dev" autocomplete="url">
+<label for="analyticsKey">Analitik erişim anahtarı (ADMIN_KEY)</label><input id="analyticsKey" type="password" autocomplete="off" placeholder="Cloudflare'da belirlediğin gizli anahtar">
+<div class="flex"><button type="button" id="analyticsConnect" class="action">Bağlan ve Kontrol Et</button><button type="button" id="analyticsNotify" class="btn secondary">Telefon Bildirimlerini Aç</button></div>
+<p id="analyticsConnection" aria-live="polite">Kurulum bekleniyor.</p><p><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare hesabını aç ↗</a></p></div></section>
 <section id="account" class="hidden"><span class="tag">GÜVENLİ YAYINLAMA</span><h2>GitHub ile giriş ve yayınlama</h2>
 <div class="card" style="max-width:720px"><h3>Turkuaz 3D sitesine yayınlama</h3><p><strong>Yönetim panelini açmak için giriş gerekmiyor.</strong> Ancak değişiklikleri sitede yayınlamak için GitHub erişimi gerekiyor. Bu sürümde kullanıcı adı ve şifre ile otomatik giriş yok.</p>
 <p><strong>İlk bağlantı:</strong> 1. Aşağıdaki GitHub bağlantısını açıp kendi hesabına giriş yap. 2. Sadece <strong>eyp7824/turkuaz3d-web</strong> deposunu seç. 3. <strong>Repository permissions → Contents → Read and write</strong> izni ver. 4. Oluşan <strong>github_pat_...</strong> kodunu alttaki kutuya yapıştır, ardından Bağlan ve Doğrula düğmesine bas. Belirteci kimseye gönderme.</p>
@@ -141,7 +147,7 @@ body.app-mobile #preview,body.app-mobile #preview.wide{display:block;width:390px
 'use strict';
 var repo='eyp7824/turkuaz3d-web', filePath='public/editor-settings.json', origin='https://turkuaz3d.com/';
 var phoneOnly = new URLSearchParams(location.search).get('mode')==='android' || (new URLSearchParams(location.search).get('mode')!=='windows' && innerWidth<700);
-var device='mobile', data={mobile:{},desktop:{}}, sha='', token=sessionStorage.getItem('t3-session-token')||'';
+var device='mobile', data={mobile:{},desktop:{}}, sha='', token=localStorage.getItem('t3-session-token')||sessionStorage.getItem('t3-session-token')||'';if(token)localStorage.setItem('t3-session-token',token);
 var fields=['heroTitle','heroDesc','accent','titleSize','imageUrl','hideImage'];
 var el=function(id){return document.getElementById(id)};
 var defaults=function(){return {heroTitle:'',heroDesc:'',accent:'#02e1da',titleSize:42,imageUrl:'',hideImage:false}};
@@ -165,8 +171,8 @@ async function fetchSettings(withToken){
  var j=await r.json();sha=j.sha;var parsed=JSON.parse(utf8FromB64(j.content));
  data.mobile=Object.assign(defaults(),parsed.mobile||{});data.desktop=Object.assign(defaults(),parsed.desktop||{});fill();return true;
 }
-el('connect').onclick=async function(){var candidate=el('token').value.trim();if(!candidate){toast('Önce erişim belirtecini yaz');return}token=candidate;try{await fetchSettings(true);sessionStorage.setItem('t3-session-token',token);el('token').value='';el('connection').textContent='✓ GitHub deposuna bağlantı kuruldu.';el('editorNote').textContent='GitHub bağlantısı hazır. Düzenleyip yayınlayabilirsin.';toast('Bağlandı');view('editor')}catch(e){token='';toast('Bağlantı hatası: '+e.message)}};
-el('disconnect').onclick=function(){sessionStorage.removeItem('t3-session-token');token='';sha='';el('connection').textContent='Oturum kapatıldı';toast('Bağlantı kapatıldı')};
+el('connect').onclick=async function(){var candidate=el('token').value.trim();if(!candidate){toast('Önce erişim belirtecini yaz');return}token=candidate;try{await fetchSettings(true);localStorage.setItem('t3-session-token',token);el('token').value='';el('connection').textContent='✓ GitHub deposuna bağlantı kuruldu.';el('editorNote').textContent='GitHub bağlantısı hazır. Düzenleyip yayınlayabilirsin.';toast('Bağlandı');view('editor')}catch(e){token='';toast('Bağlantı hatası: '+e.message)}};
+el('disconnect').onclick=function(){localStorage.removeItem('t3-session-token');sessionStorage.removeItem('t3-session-token');token='';sha='';el('connection').textContent='Oturum kapatıldı';toast('Bağlantı kapatıldı')};
 el('reset').onclick=function(){data[device]=defaults();fill();toast('Varsayılan değerler seçildi; yayınlamak için Kaydet düğmesine bas')};
 el('publish').onclick=async function(){
  if(!token){view('account');toast('Yayınlamak için önce GitHub bağlantısı kur');return}
@@ -183,6 +189,6 @@ el('publish').onclick=async function(){
  }catch(e){el('editorNote').textContent=e.message;toast(e.message)}finally{el('publish').disabled=false}
 };
 fetchSettings(false).catch(function(e){el('editorNote').textContent='Ayarlara erişilemiyor: '+e.message;fill()});
-if(token){el('connection').textContent='Oturum belirteci mevcut. Yayınlamadan önce yeniden doğrulanacak.'}
+if(token){el('connection').textContent='GitHub bağlantısı bu cihazda kayıtlı. Yayınlarken doğrulanacak.'}
 })();
-</script></body></html>
+</script><script src="/assets/analytics-admin.js" defer></script></body></html>
