@@ -5,15 +5,15 @@
 const $=id=>document.getElementById(id);
 const DB_URL='t3-analytics-worker',DB_KEY='t3-analytics-access';
 let worker=localStorage.getItem(DB_URL)||'',key=localStorage.getItem(DB_KEY)||'';
-let cursor=null, timer=null, loading=false, lastError='';
+let cursor=null, timer=null, loading=false, lastError='', trackingEnabled=false;
 const set=(id,value)=>{if($(id))$(id).textContent=String(value)};
 const clearRows=id=>{if($(id))$(id).replaceChildren()};
 const urlOk=value=>/^https:\/\/[a-z0-9.-]+(?::443)?\/?$/i.test(value);
 function status(s,ok=false){
  set('analyticsMessage',s);set('analyticsConnection',s);
- set('visitTodayStatus',ok?'Gerçek zamanlı rapor':'Analitik bağlantısı bekleniyor');
- set('notifyStatus',ok?'Aktif':'Bağlı değil');
- set('notifyDesc',ok?'Yönetim uygulaması açıkken bildirimler alınabilir.':'Worker bağlantısı bekleniyor.');
+ set('visitTodayStatus',ok?(trackingEnabled?'Gerçek zamanlı rapor':'Sunucu bağlı, site takibi henüz kapalı'):'Analitik bağlantısı bekleniyor');
+ set('notifyStatus',ok?(trackingEnabled?'İzleme bağlı':'Site takibi kapalı'):'Bağlı değil');
+ set('notifyDesc',ok?(trackingEnabled?'Bildirim izni açıkken, yeni ziyaretlerde bildirim alınabilir.':'Ziyaretçi izin bannerı ve site ölçüm ayarı henüz etkin değil.'):'Worker bağlantısı bekleniyor.');
 }
 function row(target,left,right) {
  const e=document.createElement('div');e.className='live-data-row';
@@ -64,6 +64,7 @@ async function refresh(){
  try{
   const stats=await api('/v1/stats');
   if(!stats||stats.connected!==true)throw Error('Analitik sunucusu doğrulanamadı.');
+  await checkSiteTracking();
   render(stats);
   if(cursor===null)cursor=Number(stats.cursor)||0; // do not replay past notifications
   else {
@@ -79,6 +80,13 @@ async function refresh(){
    if(e.message!==lastError){status('Bağlantı hatası: '+e.message);lastError=e.message}
  }finally{loading=false}
 }
+async function checkSiteTracking(){
+ try {
+   const result=await fetch('/public/analytics-config.json',{cache:'no-store'});
+   const cfg=await result.json();
+   trackingEnabled=Boolean(cfg&&cfg.enabled&&cfg.worker&&worker&&cfg.worker.replace(/\\/$/,'')===worker.replace(/\\/$/,''));
+ }catch{trackingEnabled=false}
+}
 async function connect(){
  const next=$('analyticsWorker').value.trim().replace(/\/$/,'');
  const nextKey=$('analyticsKey').value.trim();
@@ -91,6 +99,7 @@ async function connect(){
   localStorage.setItem(DB_URL,worker);
   localStorage.setItem(DB_KEY,key);
   $('analyticsKey').value='';
+  await checkSiteTracking();
   render(response);
   cursor=Number(response.cursor)||0;
  }catch(e){status('Bağlantı kurulamadı: '+e.message)}
