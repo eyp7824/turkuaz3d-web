@@ -2,6 +2,13 @@
 import {readFileSync} from 'node:fs';
 const pages=[
 ['index.html','https://turkuaz3d.com/'],
+['blog/index.html','https://turkuaz3d.com/blog/'],
+['blog/3d-baskida-malzeme-secimi/index.html','https://turkuaz3d.com/blog/3d-baskida-malzeme-secimi/'],
+['blog/disli-ve-cark-uretimi/index.html','https://turkuaz3d.com/blog/disli-ve-cark-uretimi/'],
+['blog/cnc-robotik-icin-3d-baski/index.html','https://turkuaz3d.com/blog/cnc-robotik-icin-3d-baski/'],
+['blog/endustriyel-prototip-uretimi/index.html','https://turkuaz3d.com/blog/endustriyel-prototip-uretimi/'],
+['blog/profesyonel-3d-modelleme/index.html','https://turkuaz3d.com/blog/profesyonel-3d-modelleme/'],
+['blog/kirik-parca-uretimi/index.html','https://turkuaz3d.com/blog/kirik-parca-uretimi/'],
 ['hizmetler/index.html','https://turkuaz3d.com/hizmetler/'],
 ['hizmetler/3d-baski-siparisi/index.html','https://turkuaz3d.com/hizmetler/3d-baski-siparisi/'],
 ['hizmetler/seri-uretim-3d-baski/index.html','https://turkuaz3d.com/hizmetler/seri-uretim-3d-baski/'],
@@ -41,6 +48,6 @@ for(const [p,canonical] of pages){
  console.log('SEO:',p,'title='+title,'description='+description.length+' chars');
 }
 add(robot.includes('Sitemap: https://turkuaz3d.com/sitemap.xml'),'robots.txt: sitemap missing');
-add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly the 8 canonical SEO pages');
+add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly the 15 canonical SEO pages');
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log('PASS: All 8 pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
+console.log('PASS: All 15 pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
