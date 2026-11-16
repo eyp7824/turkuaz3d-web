@@ -25,8 +25,39 @@ jobs:
         run: gradle :app:assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: Turkuaz-3D-Web-Android-APK
+          name: Turkuaz-3D-Web-Android-DEBUG-uninstall-required
           path: apps/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      # Unlike Gradle's debug certificate, this signing seed produces the same
+      # certificate in every build. Never commit or print ANDROID_SIGNING_SEED.
+      - name: Check whether stable Android signing is configured
+        id: signing
+        shell: bash
+        env:
+          SIGNING_SEED: ${{ secrets.ANDROID_SIGNING_SEED }}
+        run: |
+          if [ ${#SIGNING_SEED} -ge 32 ]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Signed update APK skipped: add GitHub Actions secret ANDROID_SIGNING_SEED (min 32 chars).' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Generate stable Android release signing identity
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          ANDROID_SIGNING_SEED: ${{ secrets.ANDROID_SIGNING_SEED }}
+        run: |
+          python -m pip install 'cryptography>=46,<47'
+          python apps/android/tools/generate_release_signing.py
+      - name: Build consistently signed Android release APK
+        if: steps.signing.outputs.ready == 'true'
+        working-directory: apps/android
+        run: gradle :app:assembleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: steps.signing.outputs.ready == 'true'
+        with:
+          name: Turkuaz-3D-Web-Android-SIGNED-v1.0.7-UPDATABLE
+          path: apps/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
   windows:
     runs-on: windows-latest
