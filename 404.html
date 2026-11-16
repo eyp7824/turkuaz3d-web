@@ -3,42 +3,42 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,follow">
 <script>
-/* Recovery for URLs retained from the previous hosting provider.
-   Static GitHub Pages cannot issue HTTP 301 redirects: this is a
-   visitor-friendly fallback for legacy URLs that were not recreated. */
-(function () {
+/* Gracefully recover known paths left over from the previous hosting provider.
+   Exact popular URLs also have their own zero-second meta-refresh pages.
+   Unknown paths still return a real 404 response. */
+(function(){
   var path;
-  try {path=decodeURIComponent(location.pathname).toLocaleLowerCase('tr-TR');}
-  catch(e){path=location.pathname.toLowerCase();}
-  path=path.replace(/[ıİ]/g,'i').replace(/[şŞ]/g,'s').replace(/[ğĞ]/g,'g')
-    .replace(/[üÜ]/g,'u').replace(/[öÖ]/g,'o').replace(/[çÇ]/g,'c');
+  try {path=decodeURIComponent(location.pathname).toLocaleLowerCase('tr-TR')}
+  catch(e){path=location.pathname.toLowerCase()}
+  path=path.replace(/ı/g,'i').replace(/ş/g,'s').replace(/ğ/g,'g')
+    .replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c');
   var target='';
-  if(/^\/(hizmet|hizmetler|blog|bolge|sayfa)\//.test(path)){
-    if(/(seri.uretim|eklemeli.imalat)/.test(path)){
-      target='/hizmetler/seri-uretim-3d-baski/';
-    }else if(/(siparis|online.3d|uygun.fiyat|fiyat)/.test(path)){
-      target='/hizmetler/3d-baski-siparisi/';
-    }else if(/(prototip|numune|fonksiyonel)/.test(path)){
-      target='/hizmetler/prototip-uretimi/';
-    }else if(/(disli|cark|kirik|yedek|parca|aparat|maket)/.test(path)){
-      target='/hizmetler/ozel-parca-uretimi/';
-    }else if(/(modelleme|3d.tasarim|cizim|endustriyel.tasarim|cad)/.test(path)){
-      target='/hizmetler/3d-tasarim/';
-    }else if(/^\/blog\//.test(path)){
-      target='/hizmetler/';
-    }else if(/^\/bolge\//.test(path)){
-      target='/hizmetler/3d-baski/';
-    }else if(/^\/sayfa\//.test(path)){
-      target=/(misyon|hakkimizda)/.test(path)?'/#hakkimizda':'/';
-    }else{
-      target='/hizmetler/';
-    }
-  }else if(/^\/(hakkimizda|misyonumuz)\/?$/.test(path)){
-    target='/#hakkimizda';
-  }else if(/^\/hizmetler?$/.test(path)){
-    target='/hizmetler/';
-  }
-  if(target)location.replace(target);
+  var isBlog=/^\/(?:blog|bloglar\/blog|bloglar\/bloglar)\//.test(path);
+  if(isBlog){
+    if(/(malzeme|filament|pla-|petg|abs)/.test(path))target='/blog/3d-baskida-malzeme-secimi/';
+    else if(/(disli|cark)/.test(path))target='/blog/disli-ve-cark-uretimi/';
+    else if(/(cnc|robotik)/.test(path))target='/blog/cnc-robotik-icin-3d-baski/';
+    else if(/(prototip|numune|fonksiyonel)/.test(path))target='/blog/endustriyel-prototip-uretimi/';
+    else if(/(kirik|yedek.parca|parca.kopyalama)/.test(path))target='/blog/kirik-parca-uretimi/';
+    else if(/(modelleme|tasarim|cad|cizim)/.test(path))target='/blog/profesyonel-3d-modelleme/';
+    else target='/blog/';
+  }else if(/^\/hizmet\//.test(path)){
+    if(/(seri.uretim|eklemeli.imalat)/.test(path))target='/hizmetler/seri-uretim-3d-baski/';
+    else if(/(siparis|online.3d|uygun.fiyat|fiyat)/.test(path))target='/hizmetler/3d-baski-siparisi/';
+    else if(/(prototip|numune|fonksiyonel)/.test(path))target='/hizmetler/prototip-uretimi/';
+    else if(/(disli|cark|kirik|yedek|parca|aparat|maket)/.test(path))target='/hizmetler/ozel-parca-uretimi/';
+    else if(/(modelleme|tasarim|cizim|cad)/.test(path))target='/hizmetler/3d-tasarim/';
+    else target='/hizmetler/3d-baski/';
+  }else if(/^\/bolge\//.test(path))target='/hizmetler/3d-baski/';
+  else if(/^\/sayfa\//.test(path))target=/(misyon|hakkimizda)/.test(path)?'/#hakkimizda':'/';
+  else if(/^\/(bloglar|blog)\/?$/.test(path))target='/blog/';
+  else if(/^\/(hizmetler|urunler|urun)\/?$/.test(path))target='/hizmetler/';
+  else if(/^\/(iletisim|contact)\/?$/.test(path))target='/#iletisim';
+  else if(/^\/(sorular|sss)\/?$/.test(path))target='/#sss';
+  else if(/^\/(hakkimizda|misyonumuz)\/?$/.test(path))target='/#hakkimizda';
+  var targetPath=target.split('#')[0].replace(/\/$/,'');
+  var currentPath=location.pathname.replace(/\/$/,'');
+  if(target && targetPath!==currentPath) location.replace(target);
 })();
 </script>
 <title>Sayfa Bulunamadı | Turkuaz 3D</title>
