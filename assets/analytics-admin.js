@@ -39,11 +39,36 @@ function render(stats){
  $('visitorTables').classList.remove('hidden');
  status('✓ Gerçek trafik verisi bağlı. Son güncelleme: '+new Date().toLocaleTimeString('tr-TR'),true);
 }
+window.T3PushError = function(message) {
+ set('analyticsConnection','Arka plan bildirim kurulumu: '+String(message||'Bağlantı hatası'));
+};
+window.T3ReceivePushToken = async function(deviceToken) {
+ if(!worker||!key) {
+   set('analyticsConnection','Önce Analitik bağlantısını doğrula. Firebase cihaz kaydı için ADMIN_KEY gerekiyor.');
+   return;
+ }
+ try {
+  const response=await fetch(worker+'/v1/push/register',{
+   method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+   body:JSON.stringify({token:deviceToken})
+  });
+  const answer=await response.json().catch(()=>({}));
+  if(!response.ok||!answer.ok)throw Error(answer.error||'HTTP '+response.status);
+  localStorage.setItem('t3-fcm-registered','true');
+  set('analyticsConnection','✓ Firebase arka plan bildirimi bağlı. Android uygulaması kapalıyken de bildirim gönderilebilir (telefonun izin ve pil ayarlarına bağlıdır).');
+  set('notifyDesc','Android FCM push kaydı tamamlandı; uygulama açık olmasa da gönderim yapılabilir.');
+  set('notifyStatus','FCM bağlı');
+ }catch(error){
+  localStorage.removeItem('t3-fcm-registered');
+  set('analyticsConnection','FCM bildirim sunucusu henüz hazır değil: '+error.message);
+ }
+};
 function nativeNotification(event){
  const city=event.city||'Bilinmiyor',country=event.country||'Bilinmiyor';
  const title='Turkuaz 3D Web · Yeni ziyaret';
  const message=city+', '+country+' · '+(event.page||'/');
  if(window.TurkuazNative&&typeof window.TurkuazNative.showNotification==='function'){
+   if(localStorage.getItem('t3-fcm-registered')==='true')return; // Push service handles delivery.
    window.TurkuazNative.showNotification(title,message);return;
  }
  if(window.chrome?.webview?.postMessage){
@@ -108,7 +133,7 @@ $('analyticsConnect')?.addEventListener('click',connect);
 $('analyticsNotify')?.addEventListener('click',()=>{
  if(window.TurkuazNative?.enableNotifications){
   window.TurkuazNative.enableNotifications();
-  set('analyticsConnection','Android bildirim izni istendi. Uygulama açıkken yeni ziyaretler bildirilecek.');
+  set('analyticsConnection','Android bildirim izni istendi. Firebase arka plan bildirimi bağlantısı kontrol ediliyor...');
  } else if(window.chrome?.webview?.postMessage){
   window.chrome.webview.postMessage({type:'notification-permission'});
   set('analyticsConnection','Windows masaüstü bildirimleri bu uygulama açıkken gösterilecek.');
