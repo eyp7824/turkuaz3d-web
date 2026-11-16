@@ -28,7 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=6";
+    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=7";
     private WebView browser;
     private static final String VISIT_CHANNEL = "turkuaz3d_visitors";
     private int notificationId = 100;
@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
         NotificationManager notifications = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         if (notifications != null) {
             NotificationChannel channel = new NotificationChannel(VISIT_CHANNEL, "Turkuaz 3D ziyaretçi bildirimleri", NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("Web sitesine yeni ziyaret geldiğinde bildirim verir (uygulama açıkken).");
+            channel.setDescription("Turkuaz 3D sitesine gelen yeni ziyaret bildirimleri.");
             notifications.createNotificationChannel(channel);
         }
         setContentView(root);
@@ -118,9 +118,7 @@ public class MainActivity extends Activity {
                     checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
                 } else {
-                    android.widget.Toast.makeText(MainActivity.this,
-                        "Turkuaz 3D ziyaretçi bildirimleri açık (uygulama çalışırken)",
-                        android.widget.Toast.LENGTH_LONG).show();
+                    prepareRemoteNotifications();
                 }
             });
         }
@@ -141,6 +139,23 @@ public class MainActivity extends Activity {
                     .setAutoCancel(true).setContentIntent(tap).build();
                 nm.notify(++notificationId,n);
             });
+        }
+    }
+    private void showPushMessage(String event, String message) {
+        if(browser==null)return;
+        String code="window."+event+"&&window."+event+"("+org.json.JSONObject.quote(message)+");";
+        browser.evaluateJavascript(code,null);
+    }
+    private void prepareRemoteNotifications() {
+        PushHelper.getDeviceToken(this,
+            token->showPushMessage("T3ReceivePushToken",token),
+            error->showPushMessage("T3PushError",error));
+    }
+    @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] results) {
+        super.onRequestPermissionsResult(requestCode,permissions,results);
+        if(requestCode==1001) {
+            if(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)prepareRemoteNotifications();
+            else showPushMessage("T3PushError","Telefon bildirim izni verilmedi.");
         }
     }
     @Override public void onBackPressed() {
