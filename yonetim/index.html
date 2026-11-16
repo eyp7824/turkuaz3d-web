@@ -188,6 +188,8 @@ el('publish').onclick=async function(){
  el('editorNote').textContent='Kaydedildi. GitHub Pages yayını birkaç dakika içinde günceller.';toast('✓ Değişiklikler GitHub’a kaydedildi');setTimeout(function(){el('preview').src=origin+'?editor_preview='+Date.now()},3000);
  }catch(e){el('editorNote').textContent=e.message;toast(e.message)}finally{el('publish').disabled=false}
 };
+var initialView=new URLSearchParams(location.search).get('view');
+if(['dashboard','editor','stats','account'].includes(initialView))view(initialView);
 fetchSettings(false).catch(function(e){el('editorNote').textContent='Ayarlara erişilemiyor: '+e.message;fill()});
 if(token){el('connection').textContent='GitHub bağlantısı bu cihazda kayıtlı. Yayınlarken doğrulanacak.'}
 })();
