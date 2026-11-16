@@ -6,6 +6,49 @@ const $=id=>document.getElementById(id);
 const DB_URL='t3-analytics-worker',DB_KEY='t3-analytics-access';
 const DEFAULT_WORKER='https://turkuaz3d-analytics.eyupbozkurt1316.workers.dev';
 let worker=localStorage.getItem(DB_URL)||DEFAULT_WORKER,key=localStorage.getItem(DB_KEY)||'';
+const REMEMBER_SETTING='t3-remember-analytics-enabled';
+const remember=$('rememberAnalytics');
+remember.checked=localStorage.getItem(REMEMBER_SETTING)!=='0';
+async function saveAuthorization(){
+ if(!remember.checked || !worker || !key)return false;
+ const payload=JSON.stringify({worker,key});
+ try {
+  if(window.T3Remember?.available && await window.T3Remember.save('analytics',payload)){
+   localStorage.removeItem(DB_KEY); // Do not duplicate sensitive data in unencrypted WebView storage.
+   return true;
+  }
+ }catch(e){}
+ // Browser fallback: localStorage persists in the installed app's WebView profile.
+ localStorage.setItem(DB_KEY,key);
+ return true;
+}
+async function restoreAuthorization(){
+ if(!remember.checked){
+  key='';
+  localStorage.removeItem(DB_KEY);
+ }else{
+  try {
+   if(window.T3Remember?.available){
+    const record=await window.T3Remember.load('analytics');
+    if(record){
+     const saved=JSON.parse(record);
+     if(typeof saved.worker==='string'&&urlOk(saved.worker))worker=saved.worker;
+     if(typeof saved.key==='string'&&saved.key.length>=32)key=saved.key;
+     localStorage.removeItem(DB_KEY);
+    }else if(key)await saveAuthorization();
+   }
+  }catch(e){}
+ }
+ $('analyticsWorker').value=worker;
+ $('analyticsKey').value='';
+ if(key){
+  $('analyticsKey').placeholder='Anahtar cihazda kayıtlı – tekrar yazmana gerek yok';
+  set('analyticsConnection','Beni Hatırla: kayıtlı bağlantıyla otomatik bağlanılıyor.');
+  refresh();
+ }else{
+  set('analyticsConnection','Sunucu adresi hazır. Bu cihazda henüz kayıtlı analitik erişim anahtarı yok.');
+ }
+}
 if(!localStorage.getItem(DB_URL))localStorage.setItem(DB_URL,worker);
 let cursor=null, timer=null, loading=false, lastError='', trackingEnabled=false;
 const set=(id,value)=>{if($(id))$(id).textContent=String(value)};
@@ -116,20 +159,21 @@ async function checkSiteTracking(){
 }
 async function connect(){
  const next=$('analyticsWorker').value.trim().replace(/\/$/,'');
- const nextKey=$('analyticsKey').value.trim();
+ const nextKey=$('analyticsKey').value.trim()||key;
  if(!urlOk(next)){status('HTTPS ile başlayan geçerli Cloudflare Worker adresi gerekiyor.');return}
  if(nextKey.length<32){status('Analitik anahtarı en az 32 karakter olmalı.');return}
  worker=next;key=nextKey;cursor=null;
  // Persist the owner's settings BEFORE making a network request. Temporary failures
  // must not force the user to retype the secret on the next app launch.
  localStorage.setItem(DB_URL,worker);
- localStorage.setItem(DB_KEY,key);
+ await saveAuthorization();
  try{
   const response=await api('/v1/stats');
   if(!response||response.connected!==true)throw Error('Sunucu geçersiz');
   localStorage.setItem(DB_URL,worker);
-  localStorage.setItem(DB_KEY,key);
+  await saveAuthorization();
   $('analyticsKey').value='';
+  $('analyticsKey').placeholder='Anahtar cihazda kayıtlı – tekrar yazmana gerek yok';
   await checkSiteTracking();
   render(response);
   cursor=Number(response.cursor)||0;
@@ -149,14 +193,30 @@ $('analyticsNotify')?.addEventListener('click',()=>{
   window.Notification.requestPermission().then(x=>set('analyticsConnection','Bildirim izni: '+x));
  }else set('analyticsConnection','Bu tarayıcı yerel bildirim iznini desteklemiyor.');
 });
-if(worker)$('analyticsWorker').value=worker;
-if(key){
- // Restore the existing authorization silently without making the user click Connect.
- $('analyticsKey').value='';
- refresh();
-}else{
- set('analyticsConnection','Sunucu adresi otomatik bulundu. Bu cihazda henüz yetkili giriş kaydı yok.');
-}
+$('analyticsWorker').value=worker;
+$('analyticsWorker').addEventListener('change',()=>{
+ const typed=$('analyticsWorker').value.trim().replace(/\/$/,'');
+ if(urlOk(typed)){
+  worker=typed;
+  localStorage.setItem(DB_URL,worker);
+  saveAuthorization();
+ }
+});
+$('analyticsKey').addEventListener('change',()=>{
+ const typed=$('analyticsKey').value.trim();
+ if(typed.length>=32){key=typed;saveAuthorization()}
+});
+remember.addEventListener('change',()=>{
+ const enabled=remember.checked;
+ localStorage.setItem(REMEMBER_SETTING,enabled?'1':'0');
+ if(enabled) saveAuthorization();
+ else {
+  localStorage.removeItem(DB_KEY);
+  window.T3Remember?.clear('analytics');
+  set('analyticsConnection','Beni Hatırla kapatıldı; sonraki açılışta anahtar sorulur.');
+ }
+});
+restoreAuthorization();
 timer=setInterval(refresh,12000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();
