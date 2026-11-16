@@ -6,9 +6,21 @@ on:
     paths:
       - 'index.html'
       - 'hizmetler/**'
+      - 'hizmet/**'
+      - 'blog/**'
+      - 'bloglar/**'
+      - 'bolge/**'
+      - 'sayfa/**'
+      - 'iletisim/**'
+      - 'sorular/**'
+      - 'urunler/**'
+      - 'hata/**'
+      - '404.html'
       - 'sitemap.xml'
       - 'robots.txt'
       - 'tools/seo-check.mjs'
+      - 'tools/check-legacy-urls.mjs'
+      - '.github/workflows/pages.yml'
       - '.github/workflows/check-seo.yml'
 permissions:
   contents: read
@@ -22,3 +34,5 @@ jobs:
           node-version: '22'
       - name: Verify all public SEO metadata
         run: node tools/seo-check.mjs
+      - name: Verify old hosting URLs point to existing pages
+        run: node tools/check-legacy-urls.mjs
