@@ -27,7 +27,7 @@ now = dt.datetime(2025, 1, 1, tzinfo=dt.timezone.utc)
 cert = (x509.CertificateBuilder().subject_name(name).issuer_name(name)
         .public_key(key.public_key()).serial_number(0x4a01c44b8a7128077f332ea1)
         .not_valid_before(now).not_valid_after(dt.datetime(2045, 1, 1, tzinfo=dt.timezone.utc))
-        .sign(key, hashes.SHA256()))
+        .sign(key, hashes.SHA256(), ecdsa_deterministic=True))
 passphrase = hashlib.sha256(("turkuaz3d-store-password-v1:" + seed).encode()).hexdigest()
 outfile = Path(__file__).parent.parent / "app" / "release-signing.p12"
 outfile.write_bytes(pkcs12.serialize_key_and_certificates(
