@@ -84,7 +84,7 @@ async function checkSiteTracking(){
  try {
    const result=await fetch('/public/analytics-config.json',{cache:'no-store'});
    const cfg=await result.json();
-   trackingEnabled=Boolean(cfg&&cfg.enabled&&cfg.worker&&worker&&cfg.worker.replace(/\\/$/,'')===worker.replace(/\\/$/,''));
+   trackingEnabled=Boolean(cfg&&cfg.enabled&&cfg.worker&&worker&&cfg.worker.replace(/\/$/,'')===worker.replace(/\/$/,''));
  }catch{trackingEnabled=false}
 }
 async function connect(){
