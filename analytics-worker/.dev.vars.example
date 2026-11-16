@@ -1,3 +1,2 @@
-# Cloudflare Deploy sayfasında kendi rastgele güçlü en az 32 karakterlik değerinizi girin.
-# Bu örnek dosyadaki değeri asla kullanmayın.
-ADMIN_KEY=REPLACE_WITH_YOUR_RANDOM_PRIVATE_SECRET_48_CHARACTERS
+# Cloudflare: create a NEW secret (minimum 32 random characters). Do not use a published sample value.
+ADMIN_KEY=
