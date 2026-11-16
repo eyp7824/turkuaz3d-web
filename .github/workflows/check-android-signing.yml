@@ -1,0 +1,39 @@
+name: Verify stable Android signing
+on:
+  push:
+    paths:
+      - 'apps/android/tools/generate_release_signing.py'
+      - '.github/workflows/check-android-signing.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signing-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify deterministic release certificate using non-production test seed
+        env:
+          ANDROID_SIGNING_SEED: "NONPRODUCTION-TEST-ONLY-NEVER-SIGN-REAL-UPDATES-THIS-IS-PUBLIC"
+        run: |
+          python -m pip install 'cryptography>=46,<47'
+          export GITHUB_ENV="$RUNNER_TEMP/signing-test.env"
+          python - <<'PY'
+          import hashlib, os, subprocess, sys
+          from pathlib import Path
+          from cryptography.hazmat.primitives.serialization import pkcs12
+          seed=os.environ["ANDROID_SIGNING_SEED"]
+          password=hashlib.sha256(("turkuaz3d-store-password-v1:"+seed).encode()).hexdigest().encode()
+          path=Path("apps/android/app/release-signing.p12")
+          subprocess.run([sys.executable,"apps/android/tools/generate_release_signing.py"],check=True)
+          before=pkcs12.load_key_and_certificates(path.read_bytes(),password)[1].fingerprint(__import__('cryptography').hazmat.primitives.hashes.SHA256())
+          path.unlink()
+          subprocess.run([sys.executable,"apps/android/tools/generate_release_signing.py"],check=True)
+          after=pkcs12.load_key_and_certificates(path.read_bytes(),password)[1].fingerprint(__import__('cryptography').hazmat.primitives.hashes.SHA256())
+          assert before==after,(before.hex(),after.hex())
+          path.unlink()
+          print("PASS: reproducible certificate; no production seed or APK created")
+          PY
