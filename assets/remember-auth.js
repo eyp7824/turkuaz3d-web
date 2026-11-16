@@ -17,18 +17,18 @@
     const resolve = pending.get(data.id);
     if (resolve) {
       pending.delete(data.id);
-      resolve(data.ok ? (data.value || '') : '');
+      resolve({ok:!!data.ok, value:data.ok?(data.value||''):''});
     }
   }
   if (android) android.onmessage = receive;
   else if (windows) windows.addEventListener('message', receive);
   function request(action, slot, value) {
-    if (!channel || !['github', 'analytics'].includes(slot)) return Promise.resolve('');
+    if (!channel || !['github', 'analytics'].includes(slot)) return Promise.resolve({ok:false,value:''});
     return new Promise(resolve => {
       const id = ++serial;
       pending.set(id, resolve);
       // A failed native bridge must not keep the UI waiting forever.
-      setTimeout(() => { if (pending.has(id)) { pending.delete(id); resolve(''); } }, 2500);
+      setTimeout(() => { if (pending.has(id)) { pending.delete(id); resolve({ok:false,value:''}); } }, 2500);
       try {
         channel.postMessage(JSON.stringify({type:'t3-vault',action,slot,id,value:value || ''}));
       } catch (_) {
@@ -38,8 +38,8 @@
   }
   window.T3Remember = {
     available: !!channel,
-    load: slot => request('get', slot),
-    save: (slot, value) => request('set', slot, value),
-    clear: slot => request('delete', slot)
+    load: slot => request('get', slot).then(result => result.value),
+    save: (slot, value) => request('set', slot, value).then(result => result.ok),
+    clear: slot => request('delete', slot).then(result => result.ok)
   };
 })();
