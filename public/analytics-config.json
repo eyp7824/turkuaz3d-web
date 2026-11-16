@@ -1,4 +1,4 @@
 {
-  "enabled": false,
-  "worker": ""
+  "enabled": true,
+  "worker": "https://turkuaz3d-analytics.eyupbozkurt1316.workers.dev"
 }
