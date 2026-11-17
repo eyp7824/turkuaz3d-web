@@ -1,0 +1,42 @@
+name: Update Google Business Reviews
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: google-business-reviews
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    # Leave scheduled executions disabled until the connection has been tested.
+    if: github.event_name == 'workflow_dispatch' || vars.GOOGLE_REVIEWS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download verified Google reviews
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_LOCATION_NAME: ${{ vars.GOOGLE_LOCATION_NAME }}
+        run: python3 scripts/sync_google_reviews.py
+      - name: Update public review data if changed
+        run: |
+          if [ -f data/google-reviews.json ]; then
+            git add data/google-reviews.json
+            if ! git diff --cached --quiet; then
+              git -c user.name='github-actions[bot]' \
+                  -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                  commit -m 'Update public Google reviews'
+              git push
+            fi
+          fi
