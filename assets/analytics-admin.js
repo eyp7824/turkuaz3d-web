@@ -103,6 +103,11 @@ function render(stats){
 window.T3PushError = function(message) {
  set('analyticsConnection','Arka plan bildirim kurulumu: '+String(message||'Bağlantı hatası'));
 };
+window.T3BackgroundNotificationsReady = function(message) {
+ set('analyticsConnection','✓ '+String(message||'Ücretsiz arka plan kontrolü etkin.'));
+ set('notifyDesc','Android, uygulama ekrandan kapansa da yaklaşık 15 dakikada bir yeni ziyaretleri kontrol eder. Pil tasarrufu süreyi uzatabilir.');
+ set('notifyStatus','Arka plan açık');
+};
 window.T3ReceivePushToken = async function(deviceToken) {
  if(!worker||!key) {
    set('analyticsConnection','Önce Analitik bağlantısını doğrula. Firebase cihaz kaydı için ADMIN_KEY gerekiyor.');
@@ -201,7 +206,7 @@ $('analyticsConnect')?.addEventListener('click',connect);
 $('analyticsNotify')?.addEventListener('click',()=>{
  if(window.TurkuazNative?.enableNotifications){
   window.TurkuazNative.enableNotifications();
-  set('analyticsConnection','Android bildirim izni istendi. Firebase arka plan bildirimi bağlantısı kontrol ediliyor...');
+  set('analyticsConnection','Android bildirim izni kontrol ediliyor. Ücretsiz arka plan kontrolü hazırlanıyor...');
  } else if(window.chrome?.webview?.postMessage){
   window.chrome.webview.postMessage({type:'notification-permission'});
   set('analyticsConnection','Windows masaüstü bildirimleri bu uygulama açıkken gösterilecek.');

@@ -31,6 +31,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
     private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=8&view=stats";
@@ -158,6 +164,9 @@ public class MainActivity extends Activity {
             channel.setDescription("Turkuaz 3D sitesine gelen yeni ziyaret bildirimleri.");
             notifications.createNotificationChannel(channel);
         }
+        if (Build.VERSION.SDK_INT < 33 ||
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED)
+            scheduleBackgroundVisits();
         setContentView(root);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) root.requestApplyInsets();
         browser.loadUrl(HOME);
@@ -169,7 +178,7 @@ public class MainActivity extends Activity {
                     checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
                 } else {
-                    prepareRemoteNotifications();
+                    activateBackgroundNotifications();
                 }
             });
         }
@@ -202,10 +211,30 @@ public class MainActivity extends Activity {
             token->showPushMessage("T3ReceivePushToken",token),
             error->showPushMessage("T3PushError",error));
     }
+    private void scheduleBackgroundVisits() {
+        // No Firebase or third-party registration needed: Android runs this
+        // persisted, network-constrained check when background execution allows.
+        Constraints conditions=new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build();
+        PeriodicWorkRequest request=new PeriodicWorkRequest.Builder(
+                VisitorPollingWorker.class,15,TimeUnit.MINUTES)
+                .setConstraints(conditions).build();
+        WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
+                "turkuaz3d_visits_no_registration", ExistingPeriodicWorkPolicy.KEEP,request);
+    }
+    private void activateBackgroundNotifications() {
+        scheduleBackgroundVisits();
+        showPushMessage("T3BackgroundNotificationsReady",
+            "Ücretsiz arka plan kontrolü açık. Android yaklaşık 15 dakikada bir kontrol eder; pil tasarrufu geciktirebilir.");
+        // Preserve instant Firebase delivery only if it was configured already.
+        // The free periodic check never requires a Firebase account.
+        if (!getSharedPreferences("turkuaz_push_config", MODE_PRIVATE)
+                .getString("firebase", "").isEmpty()) prepareRemoteNotifications();
+    }
     @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] results) {
         super.onRequestPermissionsResult(requestCode,permissions,results);
         if(requestCode==1001) {
-            if(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)prepareRemoteNotifications();
+            if(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)activateBackgroundNotifications();
             else showPushMessage("T3PushError","Telefon bildirim izni verilmedi.");
         }
     }
