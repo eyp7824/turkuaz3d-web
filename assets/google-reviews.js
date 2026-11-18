@@ -3,7 +3,7 @@
   const target = document.getElementById('turkuaz-google-reviews');
   if (!target) return;
 
-  const source = 'https://raw.githubusercontent.com/eyp7824/turkuaz3d-web/main/data/google-reviews.json';
+  const source = '/data/google-reviews.json';
   const note = document.querySelector('.google-reviews-note');
   const dateFormat = new Intl.DateTimeFormat('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
 
