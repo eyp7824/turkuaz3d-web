@@ -8,15 +8,18 @@
   const dateFormat = new Intl.DateTimeFormat('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
 
   function fallback() {
-    // Keep the existing widget until the direct Google integration is verified.
-    const widget = document.createElement('div');
-    widget.className = 'elfsight-app-c6e694cc-563c-4680-9d8d-0e62988b04d9';
-    widget.setAttribute('data-elfsight-app-lazy', '');
-    target.replaceChildren(widget);
-    const loader = document.createElement('script');
-    loader.src = 'https://elfsightcdn.com/platform.js';
-    loader.async = true;
-    document.head.appendChild(loader);
+    // This site uses its own Google Business Profile data, with no paid widget dependency.
+    const message = document.createElement('p');
+    message.className = 'google-reviews-unavailable';
+    message.textContent = 'Google yorumları şu anda sitede yüklenemedi. Güncel yorumları Google İşletme profilimizden görebilirsiniz.';
+
+    const link = document.createElement('a');
+    link.className = 'btn btn-light';
+    link.href = 'https://www.google.com/maps/search/?api=1&query=Turkuaz%203D%20Bursa&query_place_id=ChIJVaBnoe2MlicReTWnbVpiZPc';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Google Yorumlarını Gör ↗';
+    target.replaceChildren(message, link);
   }
 
   function reviewCard(review) {
