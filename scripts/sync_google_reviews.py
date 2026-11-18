@@ -72,7 +72,18 @@ def find_location(token: str) -> str:
     try:
         accounts = all_pages(f"{ACCOUNT_MANAGEMENT}/accounts", "accounts", token, pageSize=100)
     except urllib.error.HTTPError as error:
-        print(f"Account Management API returned HTTP {error.code}; trying legacy endpoint.", file=sys.stderr)
+        # Extract only a fixed-format Google error reason, not response details or credentials.
+        reason = "UNKNOWN"
+        try:
+            payload = json.load(error)
+            for detail in payload.get("error", {}).get("details", []):
+                candidate = detail.get("reason", "")
+                if re.fullmatch(r"[A-Z_]{3,50}", candidate):
+                    reason = candidate
+                    break
+        except (ValueError, TypeError, AttributeError, OSError):
+            pass
+        print(f"Account Management API returned HTTP {error.code}, reason {reason}; trying legacy endpoint.", file=sys.stderr)
         accounts = all_pages(f"{GOOGLE_MY_BUSINESS}/accounts", "accounts", token, pageSize=100)
 
     candidates = []
