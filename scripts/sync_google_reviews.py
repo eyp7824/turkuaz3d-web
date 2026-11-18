@@ -71,7 +71,8 @@ def find_location(token: str) -> str:
 
     try:
         accounts = all_pages(f"{ACCOUNT_MANAGEMENT}/accounts", "accounts", token, pageSize=100)
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as error:
+        print(f"Account Management API returned HTTP {error.code}; trying legacy endpoint.", file=sys.stderr)
         accounts = all_pages(f"{GOOGLE_MY_BUSINESS}/accounts", "accounts", token, pageSize=100)
 
     candidates = []
