@@ -63,6 +63,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Legacy SEO redirects include Linux-only '|' filenames. They are
+          # unrelated to the desktop app and cannot be checked out on Windows.
+          sparse-checkout: |
+            /apps/windows/
+            /favicon-96x96.png
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
