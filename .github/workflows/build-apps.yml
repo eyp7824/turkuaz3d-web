@@ -62,14 +62,24 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          # Legacy SEO redirects include Linux-only '|' filenames. They are
-          # unrelated to the desktop app and cannot be checked out on Windows.
-          sparse-checkout: |
-            /apps/windows/
-            /favicon-96x96.png
-          sparse-checkout-cone-mode: false
+      - name: Retrieve only the Windows app sources
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_REF: ${{ github.sha }}
+        run: |
+          # Legacy SEO URLs use Linux-valid filenames with '|'; Windows git
+          # rejects those paths even with sparse checkout. Fetch only these
+          # three trusted repository files through GitHub's Contents API.
+          $headers = @{Authorization="Bearer $env:GH_TOKEN";Accept="application/vnd.github+json"}
+          foreach ($path in @('apps/windows/Program.cs','apps/windows/Turkuaz3DWeb.csproj','favicon-96x96.png')) {
+            $target = Join-Path (Get-Location) $path
+            New-Item -ItemType Directory -Force -Path (Split-Path $target) | Out-Null
+            $url = "https://api.github.com/repos/${{ github.repository }}/contents/$path" + "?ref=$env:SOURCE_REF"
+            $record = Invoke-RestMethod -Uri $url -Headers $headers
+            $bytes = [Convert]::FromBase64String(($record.content -replace '\s',''))
+            [IO.File]::WriteAllBytes($target, $bytes)
+          }
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
