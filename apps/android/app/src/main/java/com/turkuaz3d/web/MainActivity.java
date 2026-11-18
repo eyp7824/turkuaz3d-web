@@ -33,7 +33,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=7&view=stats";
+    private static final String HOME = "https://turkuaz3d.com/yonetim/?mode=android&layout=8&view=stats";
     private WebView browser;
     private static final String VISIT_CHANNEL = "turkuaz3d_visitors";
     private int notificationId = 100;

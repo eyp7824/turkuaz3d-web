@@ -92,14 +92,18 @@ sealed class TurkuazWindow : Form
             (Visible && WindowState != FormWindowState.Minimized)) return;
         checkingBackground = true;
         try {
-            // The access key stays in this computer's WebView profile and is sent
-            // only to the trusted owner's configured Cloudflare endpoint.
-            string js = await view.CoreWebView2.ExecuteScriptAsync(
-                "JSON.stringify({worker:localStorage.getItem('t3-analytics-worker'),key:localStorage.getItem('t3-analytics-access')})");
-            string config = JsonSerializer.Deserialize<string>(js) ?? "{}";
+            // The encrypted Windows DPAPI vault is authoritative. The frontend
+            // removes the plaintext key from localStorage after saving it there.
+            // Keep a fallback for older installations that have not migrated.
+            string config = CredentialVault.Read("analytics");
+            if (string.IsNullOrWhiteSpace(config)) {
+                string js = await view.CoreWebView2.ExecuteScriptAsync(
+                    "JSON.stringify({worker:localStorage.getItem('t3-analytics-worker'),key:localStorage.getItem('t3-analytics-access')})");
+                config = JsonSerializer.Deserialize<string>(js) ?? "{}";
+            }
             using var doc = JsonDocument.Parse(config);
-            string endpoint = doc.RootElement.GetProperty("worker").GetString() ?? "";
-            string key = doc.RootElement.GetProperty("key").GetString() ?? "";
+            string endpoint = doc.RootElement.TryGetProperty("worker",out var w) ? w.GetString() ?? "" : "";
+            string key = doc.RootElement.TryGetProperty("key",out var k) ? k.GetString() ?? "" : "";
             if (!Uri.TryCreate(endpoint,UriKind.Absolute,out var service) ||
                 service.Scheme != "https" || key.Length < 32) return;
             string route=backgroundCursor < 0 ? "/v1/stats" : "/v1/events?after="+backgroundCursor;

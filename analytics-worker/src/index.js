@@ -3,6 +3,19 @@
 const SITE = 'https://turkuaz3d.com';
 const TRUSTED = new Set([SITE, 'https://www.turkuaz3d.com']);
 const VALID = /^[a-zA-Z0-9_-]{12,100}$/;
+let contactSchemaTask;
+function ensureContactSchema(env) {
+  // Also initialize on first request so older Cloudflare deployments do not
+  // require the user to manually execute a new D1 migration.
+  if (!contactSchemaTask) contactSchemaTask=(async()=>{
+    await env.DB.prepare(`CREATE TABLE IF NOT EXISTS contact_clicks (
+      id TEXT PRIMARY KEY, visitor_id TEXT NOT NULL, clicked_at INTEGER NOT NULL,
+      kind TEXT NOT NULL CHECK(kind IN ('whatsapp','phone')), page TEXT NOT NULL
+    )`).run();
+    await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_contact_clicks_at ON contact_clicks(clicked_at)').run();
+  })().catch(error=>{contactSchemaTask=null;throw error});
+  return contactSchemaTask;
+}
 function json(obj, status = 200, extra = {}) {
   return new Response(JSON.stringify(obj), {status, headers: {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...extra}});
 }
@@ -111,21 +124,52 @@ async function record(req, env, ctx) {
   }
   return json({ok:true,new:fresh},200,cors(req.headers.get('Origin')));
 }
+async function recordContactClick(req,env) {
+  if(!allow(req))return json({error:'origin'},403);
+  if(Number(req.headers.get('Content-Length')||0)>1024)return json({error:'too_large'},413);
+  let input;
+  try{input=JSON.parse((await req.text()).slice(0,1025))}catch{return json({error:'json'},400,cors(req.headers.get('Origin')))}
+  if(!input || !VALID.test(String(input.eventId||'')) || !VALID.test(String(input.id||'')) ||
+      !['whatsapp','phone'].includes(input.kind))return json({error:'invalid_click'},400,cors(req.headers.get('Origin')));
+  const page=clean(input.path||'/',150);
+  if(!page.startsWith('/') || page.startsWith('/yonetim/'))return json({error:'invalid_page'},400,cors(req.headers.get('Origin')));
+  await ensureContactSchema(env);
+  // eventId is unique for each click; retries with the same eventId are not double-counted.
+  const saved=await env.DB.prepare('INSERT OR IGNORE INTO contact_clicks(id,visitor_id,clicked_at,kind,page) VALUES(?,?,?,?,?)')
+    .bind(input.eventId,input.id,Date.now(),input.kind,page).run();
+  return json({ok:true,new:(saved.meta?.changes||0)>0},200,cors(req.headers.get('Origin')));
+}
 async function stats(env) {
+ await ensureContactSchema(env);
  const now=Date.now();
  const today=(Math.floor((now+3*60*60*1000)/(24*60*60*1000))*(24*60*60*1000))-(3*60*60*1000);
  const week=now-7*24*60*60*1000;
  const active=now-90*1000;
- const [totals,cities,pages,latest,maxEvent]=await Promise.all([
+ const month=now-30*24*60*60*1000;
+ const [totals,cities,pages,latest,maxEvent,clicks,clickPages]=await Promise.all([
   env.DB.prepare('SELECT SUM(CASE WHEN started_at>=? THEN 1 ELSE 0 END) AS today, SUM(CASE WHEN started_at>=? THEN 1 ELSE 0 END) AS week, SUM(CASE WHEN last_seen_at>=? THEN 1 ELSE 0 END) AS online, ROUND(AVG(CASE WHEN duration_seconds > 0 THEN duration_seconds END)) AS average_seconds FROM visits').bind(today,week,active).first(),
   env.DB.prepare('SELECT city,country,COUNT(*) AS visits FROM visits WHERE started_at>=? GROUP BY city,country ORDER BY visits DESC LIMIT 12').bind(week).all(),
   env.DB.prepare('SELECT page,COUNT(*) AS visits FROM pageviews WHERE first_seen_at>=? GROUP BY page ORDER BY visits DESC LIMIT 10').bind(week).all(),
   env.DB.prepare('SELECT country,city,page,started_at,duration_seconds FROM visits ORDER BY started_at DESC LIMIT 20').all(),
-  env.DB.prepare('SELECT COALESCE(MAX(id),0) AS id FROM visit_events').first()
+  env.DB.prepare('SELECT COALESCE(MAX(id),0) AS id FROM visit_events').first(),
+  env.DB.prepare(`SELECT kind,
+     SUM(CASE WHEN clicked_at>=? THEN 1 ELSE 0 END) AS today,
+     SUM(CASE WHEN clicked_at>=? THEN 1 ELSE 0 END) AS week,
+     COUNT(*) AS month
+     FROM contact_clicks WHERE clicked_at>=? GROUP BY kind`).bind(today,week,month).all(),
+  env.DB.prepare('SELECT page,kind,COUNT(*) AS clicks FROM contact_clicks WHERE clicked_at>=? GROUP BY page,kind ORDER BY clicks DESC LIMIT 12').bind(month).all()
  ]);
+ const contact={today:{whatsapp:0,phone:0},week:{whatsapp:0,phone:0},month:{whatsapp:0,phone:0},pages:clickPages.results||[]};
+ for(const row of clicks.results||[]){
+   if(row.kind==='whatsapp'||row.kind==='phone'){
+     contact.today[row.kind]=row.today||0;
+     contact.week[row.kind]=row.week||0;
+     contact.month[row.kind]=row.month||0;
+   }
+ }
  return {connected:true,updated_at:now,now_online:totals?.online||0,today:totals?.today||0,
    last_7_days:totals?.week||0,avg_seconds:totals?.average_seconds||0,
-   cities:cities.results||[],pages:pages.results||[],recent:latest.results||[],cursor:maxEvent?.id||0};
+   cities:cities.results||[],pages:pages.results||[],recent:latest.results||[],cursor:maxEvent?.id||0,contact};
 }
 async function events(env, after) {
  const n=Number.isFinite(after)?Math.min(Math.max(0,after),2147483647):0;
@@ -139,7 +183,8 @@ export default {
    ctx.waitUntil(Promise.all([
      env.DB.prepare('DELETE FROM pageviews WHERE first_seen_at<?').bind(old).run(),
      env.DB.prepare('DELETE FROM visit_events WHERE created_at<?').bind(old).run(),
-     env.DB.prepare('DELETE FROM visits WHERE started_at<?').bind(old).run()
+     env.DB.prepare('DELETE FROM visits WHERE started_at<?').bind(old).run(),
+     ensureContactSchema(env).then(()=>env.DB.prepare('DELETE FROM contact_clicks WHERE clicked_at<?').bind(old).run())
    ]));
  },
  async fetch(req,env,ctx) {
@@ -154,6 +199,9 @@ export default {
   if (!env.DB) return json({error:'D1 bağlanmamış'},503,cors(origin));
   if (path==='/v1/visit' && req.method==='POST') {
     try {return await record(req,env,ctx)} catch(e){return json({error:'ingest_failed'},500,cors(origin))}
+  }
+  if (path==='/v1/contact-click' && req.method==='POST') {
+    try {return await recordContactClick(req,env)} catch(e){return json({error:'contact_click_failed'},500,cors(origin))}
   }
   if ((path==='/v1/stats'||path==='/v1/events')&&req.method==='GET') {
     if(!allow(req) || !authed(req,env)) return json({error:'Erişim reddedildi'},401,cors(origin));

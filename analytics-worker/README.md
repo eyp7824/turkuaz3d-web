@@ -1,5 +1,15 @@
 # Turkuaz 3D — kolay Cloudflare kurulumu
 
+**Mevcut kuruluma yeni özellik:** WhatsApp ve telefon bağlantısı tıklamalarını
+sayabilmek için `src/index.js` güncellenmelidir. Yeni `/v1/contact-click`
+uç noktası, ziyaretçinin kabul ettiği analitik izniyle çalışır; gönderilmiş
+WhatsApp mesajı veya gerçekleşmiş telefon görüşmesi olarak yorumlanmamalıdır.
+`/v1/stats` sonucunda `contact.today`, `contact.week`, `contact.month` ve
+`contact.pages` bulunur. `0003_contact_clicks.sql` veritabanı şeması Worker
+tarafından ilk istekte güvenle oluşturulur; ayrıca `npm run deploy` ile
+migration da uygulanabilir. GitHub Pages dağıtımı mevcut Cloudflare Worker'ı
+kendiliğinden güncellemez. Bu nedenle mevcut Worker'a yeni sürümü dağıtın.
+
 **Tek tıkla dağıtım:** [Turkuaz 3D Analitik Cloudflare kurulumunu aç](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Feyp7824%2Fturkuaz3d-web%2Ftree%2Fmain%2Fanalytics-worker)
 
 Cloudflare'ın resmi dağıtım aracı, GitHub'daki bu klasörü içeri aktararak Worker'ı ve D1 veritabanını kurabilir; `package.json` içindeki `deploy` komutu da SQL tablolarını oluşturur.

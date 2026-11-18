@@ -6,6 +6,7 @@ on:
       - 'analytics-worker/**'
       - 'assets/analytics-admin.js'
       - 'assets/visit-tracker.js'
+      - 'yonetim/index.html'
       - '.github/workflows/validate-analytics.yml'
   workflow_dispatch:
 permissions:
@@ -23,15 +24,18 @@ jobs:
           node --check analytics-worker/src/index.js
           node --check assets/analytics-admin.js
           node --check assets/visit-tracker.js
+      - name: Test contact click counting and authorization
+        run: node --test analytics-worker/test/*.test.mjs
       - name: Verify database migration
         run: |
           python - <<'PY'
           import sqlite3
-          p='analytics-worker/migrations/0001_initial.sql'
           db=sqlite3.connect(':memory:')
-          with open(p,encoding='utf8') as f: db.executescript(f.read())
+          from pathlib import Path
+          for p in sorted(Path('analytics-worker/migrations').glob('*.sql')):
+            db.executescript(p.read_text(encoding='utf8'))
           tables={x[0] for x in db.execute("select name from sqlite_master where type='table'")}
-          assert {'visits','visit_events','pageviews'} <= tables,tables
+          assert {'visits','visit_events','pageviews','contact_clicks'} <= tables,tables
           print('SQL schema verified:',sorted(tables))
           PY
       - name: Verify statically configured frontend

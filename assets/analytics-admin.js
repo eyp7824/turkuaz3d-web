@@ -8,7 +8,10 @@ const DEFAULT_WORKER='https://turkuaz3d-analytics.eyupbozkurt1316.workers.dev';
 let worker=localStorage.getItem(DB_URL)||DEFAULT_WORKER,key=localStorage.getItem(DB_KEY)||'';
 const REMEMBER_SETTING='t3-remember-analytics-enabled';
 const remember=$('rememberAnalytics');
-remember.checked=localStorage.getItem(REMEMBER_SETTING)!=='0';
+// This is a personal management app: remember by default and never silently
+// clear the owner's key on page reload or an ordinary connection failure.
+remember.checked=true;
+localStorage.setItem(REMEMBER_SETTING,'1');
 async function saveAuthorization(){
  if(!remember.checked || !worker || !key)return false;
  const payload=JSON.stringify({worker,key});
@@ -74,6 +77,19 @@ function render(stats){
  let secs=Math.max(0,Number(stats.avg_seconds)||0);
  set('avgDuration',secs>=60?Math.floor(secs/60)+' dk '+(secs%60)+' sn':secs+' sn');
  set('visitCityStatus','Son 7 günde '+(stats.cities?.length||0)+' farklı şehir/ülke');
+ if(stats.contact){
+   for(const period of ['today','week','month']){
+     set('clickWhatsapp'+period,stats.contact[period]?.whatsapp??0);
+     set('clickPhone'+period,stats.contact[period]?.phone??0);
+   }
+   clearRows('contactPageTable');
+   (stats.contact.pages||[]).slice(0,12).forEach(x=>row('contactPageTable',
+     (x.kind==='whatsapp'?'WhatsApp':'Telefon')+' · '+(x.page||'/'),x.clicks||0));
+   $('contactStats').classList.remove('hidden');
+   set('contactStatsMessage','Gerçek tıklama verileri · mesaj veya tamamlanmış görüşme değildir.');
+ }else{
+   set('contactStatsMessage','İletişim sayacı için analitik sunucusunun güncellenmesi gerekiyor.');
+ }
  ['cityTable','pageTable','recentTable'].forEach(clearRows);
  (stats.cities||[]).slice(0,12).forEach(x=>row('cityTable',(x.city||'Bilinmiyor')+' / '+(x.country||'—'),x.visits||0));
  (stats.pages||[]).slice(0,10).forEach(x=>row('pageTable',x.page||'/',x.visits||0));
@@ -205,16 +221,6 @@ $('analyticsWorker').addEventListener('change',()=>{
 $('analyticsKey').addEventListener('change',()=>{
  const typed=$('analyticsKey').value.trim();
  if(typed.length>=32){key=typed;saveAuthorization()}
-});
-remember.addEventListener('change',()=>{
- const enabled=remember.checked;
- localStorage.setItem(REMEMBER_SETTING,enabled?'1':'0');
- if(enabled) saveAuthorization();
- else {
-  localStorage.removeItem(DB_KEY);
-  window.T3Remember?.clear('analytics');
-  set('analyticsConnection','Beni Hatırla kapatıldı; sonraki açılışta anahtar sorulur.');
- }
 });
 restoreAuthorization();
 timer=setInterval(refresh,12000);

@@ -3,6 +3,7 @@
 - Windows app: `apps/windows`. GitHub Actions builds a Windows x64 executable.
 - Both apps open the branded administration interface at https://turkuaz3d.com/yonetim/
 - Android **only** presents mobile site editor. Windows presents both mobile/desktop editor.
-- Saving requires a fine-grained GitHub personal access token with Contents: read/write permission **only** for eyp7824/turkuaz3d-web. It is kept in sessionStorage and never committed to the repository.
-- Visitor analytics and visitor push alerts are NOT connected; the interface correctly shows no data. A trusted collection/notification backend must be deployed to enable them.
+- Saving requires a fine-grained GitHub personal access token with Contents: read/write permission **only** for eyp7824/turkuaz3d-web. It is never committed to the repository.
+- **Beni Hatırla is always checked.** The GitHub token and Cloudflare `ADMIN_KEY` are saved in the Android Keystore-backed encrypted vault and in the Windows user's DPAPI-encrypted vault. After ordinary app restarts or updates with the same signing identity, these are restored automatically. Only uninstalling/resetting the app, a signing-identity change, token expiration/revocation, or clearing device data can require a new entry.
+- The live visitor and contact-click counters depend on the owner's configured Cloudflare Worker + D1. The website counts WhatsApp/telephone **button clicks only after consent**, not sent messages or completed calls. To enable the new counters, deploy the updated `analytics-worker` source to the **existing** Worker; website publication alone does not update the Worker.
 - The Android debug APK is a test build, not a Play Store signed release.
