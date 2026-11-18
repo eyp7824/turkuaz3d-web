@@ -142,6 +142,7 @@ def main() -> int:
     if not all(creds.values()):
         print("Google reviews sync is not configured yet; existing website remains unchanged.")
         return 0
+    stage = "OAuth token"
     try:
         token_data = request_json(
             "https://oauth2.googleapis.com/token",
@@ -152,7 +153,9 @@ def main() -> int:
         token = token_data.get("access_token", "")
         if not token:
             raise ValueError("Google did not return an access token")
+        stage = "Business Profile location discovery"
         location = find_location(token)
+        stage = "Google Business reviews"
         fresh = fetch_reviews(token, location)
         if OUTPUT.exists():
             previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
@@ -165,6 +168,10 @@ def main() -> int:
         OUTPUT.write_text(json.dumps(fresh, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"Saved {len(fresh['reviews'])} reviews (total: {fresh['total_review_count']}).")
         return 0
+    except urllib.error.HTTPError as error:
+        # Only the request phase and HTTP status are logged; never print request data.
+        print(f"Google reviews API failed at {stage} (HTTP {error.code}).", file=sys.stderr)
+        return 1
     except (urllib.error.URLError, ValueError, KeyError, OSError, json.JSONDecodeError) as error:
         # No secret values or OAuth token responses are logged.
         print(f"Google reviews could not be synchronized ({type(error).__name__}).", file=sys.stderr)
