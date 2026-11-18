@@ -29,3 +29,11 @@
 @media(max-width:700px){.google-reviews-box{padding:8px 0}.contact-address address{font-size:18px}.contact-address .btn{font-size:17px;width:100%}.google-review-actions .btn{font-size:18px}.contact-location{padding-bottom:40px}}
 
 .service-contact-address{padding-bottom:44px;font-size:17px;line-height:1.65;font-weight:700;color:#ecffff}.service-contact-address a{color:#d4ffff;text-decoration:underline;text-underline-offset:4px;white-space:nowrap}@media(max-width:700px){.service-contact-address{padding-bottom:35px;font-size:17px}.service-contact-address a{white-space:normal;display:inline-block;margin-top:8px}}
+
+/* Responsive service visuals selected from customer-provided illustrative images */
+.inner-figure,.article-figure{margin:0;min-width:0}
+.inner-figure img,.article-figure img{display:block;width:100%;height:auto;max-width:100%;border-radius:18px;box-shadow:0 10px 26px rgba(9,43,58,.12)}
+.inner-figure figcaption,.article-figure figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:#526a75}
+.illustration-note{font-weight:700;white-space:nowrap}
+.article-figure{margin:22px 0 28px}
+@media(max-width:700px){.inner-figure img,.article-figure img{border-radius:14px}.inner-figure figcaption,.article-figure figcaption{font-size:14px;line-height:1.55}}
