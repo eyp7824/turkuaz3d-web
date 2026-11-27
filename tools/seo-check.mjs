@@ -15,7 +15,15 @@ const pages=[
 ['hizmetler/3d-baski/index.html','https://turkuaz3d.com/hizmetler/3d-baski/'],
 ['hizmetler/3d-tasarim/index.html','https://turkuaz3d.com/hizmetler/3d-tasarim/'],
 ['hizmetler/prototip-uretimi/index.html','https://turkuaz3d.com/hizmetler/prototip-uretimi/'],
-['hizmetler/ozel-parca-uretimi/index.html','https://turkuaz3d.com/hizmetler/ozel-parca-uretimi/']
+['hizmetler/ozel-parca-uretimi/index.html','https://turkuaz3d.com/hizmetler/ozel-parca-uretimi/'],
+['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
+['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
+['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['bolge/bursa-ilceleri-3d-baski/index.html','https://turkuaz3d.com/bolge/bursa-ilceleri-3d-baski/'],
+['bolge/turkiye-geneli-3d-baski/index.html','https://turkuaz3d.com/bolge/turkiye-geneli-3d-baski/'],
+['blog/pla-petg-farki/index.html','https://turkuaz3d.com/blog/pla-petg-farki/'],
+['blog/stl-dosyasi-hazirlama-rehberi/index.html','https://turkuaz3d.com/blog/stl-dosyasi-hazirlama-rehberi/'],
+['blog/prototipten-seri-uretime-gecis/index.html','https://turkuaz3d.com/blog/prototipten-seri-uretime-gecis/']
 ];
 const attr=(h,name)=>{
  const re=new RegExp('<meta\\s+(?:name|property)="'+name+'"\\s+content="([^"]*)"', 'i');
@@ -48,6 +56,6 @@ for(const [p,canonical] of pages){
  console.log('SEO:',p,'title='+title,'description='+description.length+' chars');
 }
 add(robot.includes('Sitemap: https://turkuaz3d.com/sitemap.xml'),'robots.txt: sitemap missing');
-add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly the 15 canonical SEO pages');
+add((sitemap.match(/<url>/g)||[]).length===pages.length,'Sitemap should contain exactly the '+pages.length+' canonical SEO pages');
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log('PASS: All 15 pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
+console.log('PASS: All '+pages.length+' pages have unique SEO title, description, OG, Twitter, canonical, structured data and sitemap.');
