@@ -20,7 +20,6 @@ const pages=[
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
 ['hizmetler/bursa-3d-baski-merkezi/index.html','https://turkuaz3d.com/hizmetler/bursa-3d-baski-merkezi/'],
-['hizmetler/bursa-3d-baski-merkezi/index.html','https://turkuaz3d.com/hizmetler/bursa-3d-baski-merkezi/'],
 ['hizmetler/maket-uretimi/index.html','https://turkuaz3d.com/hizmetler/maket-uretimi/'],
 ['hizmetler/akulu-sandalye-parcalari/index.html','https://turkuaz3d.com/hizmetler/akulu-sandalye-parcalari/'],
 ['blog/engelli-bireyler-icin-yardimci-aparat-3d-baski/index.html','https://turkuaz3d.com/blog/engelli-bireyler-icin-yardimci-aparat-3d-baski/'],
