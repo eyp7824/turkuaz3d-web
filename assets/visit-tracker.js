@@ -23,6 +23,27 @@
       fetch(endpoint,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain'},body:payload,keepalive:true}).catch(()=>{});
     }catch{}
   }
+  // Legacy fallback: an analytics Worker that predates /v1/contact-click answers
+  // 404. Until the Worker is updated, a consented contact click is reported as a
+  // labelled visit so the owner's apps still alert. Once the Worker supports
+  // clicks (it answers 400 to the empty probe) this fallback is never used.
+  let legacyClicks=null;
+  try{legacyClicks=sessionStorage.getItem('t3-legacy-clicks')}catch{}
+  if(legacyClicks===null){
+    try{
+      fetch(clickEndpoint,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain'},body:'{}'})
+        .then(r=>{legacyClicks=r&&r.status===404?'1':'0';try{sessionStorage.setItem('t3-legacy-clicks',legacyClicks)}catch{}})
+        .catch(()=>{});
+    }catch{}
+  }
+  function sendLegacy(kind){
+    const label=(kind==='whatsapp'?'💬 WhatsApp tıklaması':'☎ Telefon tıklaması')+' · '+location.pathname;
+    const body=JSON.stringify({id:crypto.randomUUID().replace(/-/g,''),path:label,kind:'enter',duration:0});
+    try{
+      if(navigator.sendBeacon && navigator.sendBeacon(endpoint,new Blob([body],{type:'text/plain'})))return;
+      fetch(endpoint,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain'},body,keepalive:true}).catch(()=>{});
+    }catch{}
+  }
   // The consented visitor's explicit click is counted, not a completed call
   // or a WhatsApp message. Never transmit phone numbers or message contents.
   document.addEventListener('click',event=>{
@@ -38,6 +59,7 @@
       }catch{}
     }
     if(!kind)return;
+    if(legacyClicks==='1')sendLegacy(kind);
     const payload=JSON.stringify({id,eventId:crypto.randomUUID().replace(/-/g,''),kind,path:location.pathname});
     try{
       const blob=new Blob([payload],{type:'text/plain'});

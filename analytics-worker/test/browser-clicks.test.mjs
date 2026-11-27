@@ -5,7 +5,7 @@ import {runInNewContext} from 'node:vm';
 
 const source=readFileSync(new URL('../../assets/visit-tracker.js',import.meta.url),'utf8');
 
-async function simulate(consent){
+async function simulate(consent,legacy=false){
   const sent=[];
   const handlers={};
   const storage=new Map([['t3-analytics-consent',consent]]);
@@ -20,7 +20,7 @@ async function simulate(consent){
     Blob,URL,Date,JSON,Math,
     setInterval:()=>1,
     addEventListener:()=>{},
-    fetch:async()=>({ok:true,json:async()=>({enabled:true,worker:'https://worker.example'})})
+    fetch:async(url)=>String(url).endsWith('/v1/contact-click')?{ok:false,status:legacy?404:400}:({ok:true,json:async()=>({enabled:true,worker:'https://worker.example'})})
   };
   runInNewContext(source,context);
   await new Promise(resolve=>setImmediate(resolve));
@@ -38,6 +38,26 @@ test('click tracking is consent-gated and distinguishes links without collecting
   assert.deepEqual((await Promise.all(clicks.map(x=>x.body.text()))).map(x=>JSON.parse(x).kind),['whatsapp','phone']);
   assert.ok(!JSON.stringify(await Promise.all(clicks.map(x=>x.body.text()))).includes('Private'));
   const denied=await simulate('no');
+  denied.click('tel:+905423954447');
+  assert.equal(denied.sent.length,0);
+});
+
+test('legacy Worker (no /v1/contact-click): consented click is reported as a labelled visit, never when the Worker is current',async()=>{
+  const legacy=await simulate('yes',true);
+  await new Promise(resolve=>setImmediate(resolve));
+  legacy.click('https://wa.me/905423954447?text=Private+message');
+  const visits=await Promise.all(legacy.sent.filter(x=>x.url.endsWith('/v1/visit')).map(x=>x.body.text()));
+  const labelled=visits.map(x=>JSON.parse(x)).filter(x=>x.path.includes('WhatsApp tıklaması'));
+  assert.equal(labelled.length,1);
+  assert.ok(labelled[0].path.includes('/hizmetler/3d-baski/'));
+  assert.ok(!JSON.stringify(visits).includes('Private')&&!JSON.stringify(visits).includes('905423954447'),'no phone number or message text');
+  const current=await simulate('yes',false);
+  await new Promise(resolve=>setImmediate(resolve));
+  current.click('tel:+905423954447');
+  const extra=await Promise.all(current.sent.filter(x=>x.url.endsWith('/v1/visit')).map(x=>x.body.text()));
+  assert.equal(extra.map(x=>JSON.parse(x)).filter(x=>x.path.includes('tıklaması')).length,0);
+  const denied=await simulate('no',true);
+  await new Promise(resolve=>setImmediate(resolve));
   denied.click('tel:+905423954447');
   assert.equal(denied.sent.length,0);
 });
