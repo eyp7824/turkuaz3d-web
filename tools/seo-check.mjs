@@ -19,6 +19,7 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['hizmetler/kanepe-ayagi-aparati/index.html','https://turkuaz3d.com/hizmetler/kanepe-ayagi-aparati/'],
 ['hizmetler/kelebek-anahtarlik/index.html','https://turkuaz3d.com/hizmetler/kelebek-anahtarlik/'],
 ['hizmetler/kahve-makinesi-tus-paneli/index.html','https://turkuaz3d.com/hizmetler/kahve-makinesi-tus-paneli/'],
 ['hizmetler/metal-dedektor-kizak-takimi/index.html','https://turkuaz3d.com/hizmetler/metal-dedektor-kizak-takimi/'],
