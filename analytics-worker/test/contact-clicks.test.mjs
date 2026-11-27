@@ -8,6 +8,7 @@ function environment(){
   const sqlite=new DatabaseSync(':memory:');
   sqlite.exec(readFileSync(new URL('../migrations/0001_initial.sql',import.meta.url),'utf8'));
   sqlite.exec(readFileSync(new URL('../migrations/0002_fcm_push.sql',import.meta.url),'utf8'));
+  sqlite.exec(readFileSync(new URL('../migrations/0003_contact_clicks.sql',import.meta.url),'utf8'));
   return {
     ADMIN_KEY:'test_'.repeat(12),
     DB:{prepare(sql){
@@ -51,4 +52,30 @@ test('contact clicks: counted, deduplicated, authorized, and split by channel',a
   assert.equal(stats.contact.month.phone,1);
   assert.equal(stats.contact.pages.length,2);
   assert.equal(stats.today,0,'Contact clicks must not artificially increase visitor counts');
+});
+
+test('contact clicks: new click notifies the owner (events feed, Telegram, FCM path) once',async()=>{
+  const env=environment();
+  env.TELEGRAM_BOT_TOKEN='123456:test-token';env.TELEGRAM_CHAT_ID='42';
+  const calls=[];const realFetch=globalThis.fetch;
+  globalThis.fetch=async(url,init)=>{calls.push({url:String(url),body:init?.body});return new Response('{}',{status:200})};
+  try{
+    const pending=[];const ctx={waitUntil:p=>pending.push(p)};
+    const click={id:'abc123abc123abc123abc123abc123ab',eventId:'note123note123note123note123note1',path:'/hizmetler/3d-baski/',kind:'phone'};
+    let res=await worker.fetch(req('/v1/contact-click',click),env,ctx);
+    assert.equal((await res.json()).new,true);
+    res=await worker.fetch(req('/v1/contact-click',click),env,ctx);
+    assert.equal((await res.json()).new,false,'a retry must not create a second notification');
+    await Promise.all(pending);
+    const feed=await (await worker.fetch(req('/v1/events?after=0',null,'https://turkuaz3d.com',env.ADMIN_KEY),env)).json();
+    assert.equal(feed.events.length,1);
+    assert.match(feed.events[0].page,/Telefon tıklaması/);
+    assert.match(feed.events[0].page,/\/hizmetler\/3d-baski\//);
+    const telegram=calls.filter(c=>c.url.includes('api.telegram.org'));
+    assert.equal(telegram.length,1);
+    assert.match(JSON.parse(telegram[0].body).text,/Telefon tıklaması/);
+    assert.ok(!JSON.stringify(calls).includes('905423954447'),'phone numbers must never be sent');
+    const stats=await (await worker.fetch(req('/v1/stats',null,'https://turkuaz3d.com',env.ADMIN_KEY),env)).json();
+    assert.equal(stats.today,0,'click notifications must not inflate visitor counts');
+  }finally{globalThis.fetch=realFetch}
 });

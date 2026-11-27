@@ -33,9 +33,9 @@ function authed(req, env) {
     // Constant-time comparison (web crypto) isn't synchronous; length matching + exact check is sufficient here
     token === env.ADMIN_KEY);
 }
-async function sendTelegram(env, visitor) {
+async function sendTelegram(env, visitor, heading='Yeni ziyaret') {
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return;
-  const text = '🔔 Turkuaz 3D Web — Yeni ziyaret\n📍 ' +
+  const text = '🔔 Turkuaz 3D Web — ' + heading + '\n📍 ' +
     visitor.city + ', ' + visitor.country + '\n📄 ' + visitor.page + '\n🕒 ' +
     new Date(visitor.time).toLocaleString('tr-TR', {timeZone:'Europe/Istanbul'});
   const url='https://api.telegram.org/bot'+env.TELEGRAM_BOT_TOKEN+'/sendMessage';
@@ -61,10 +61,10 @@ async function fcmAccessToken(env){
  const data=await res.json();googleAccess=data.access_token;googleExpires=Date.now()+(Math.max(600,Number(data.expires_in)||3600)-90)*1000;
  return googleAccess;
 }
-async function pushToPhones(env,visitor){
+async function pushToPhones(env,visitor,heading='Yeni ziyaret'){
  const access=await fcmAccessToken(env);if(!access)return;
  const devices=(await env.DB.prepare('SELECT token FROM push_devices ORDER BY registered_at DESC LIMIT 20').all()).results||[];
- const title='Turkuaz 3D Web · Yeni ziyaret';
+ const title='Turkuaz 3D Web · '+heading;
  const body=visitor.city+', '+visitor.country+' · '+visitor.page;
  for(const d of devices){
   try{
@@ -124,7 +124,7 @@ async function record(req, env, ctx) {
   }
   return json({ok:true,new:fresh},200,cors(req.headers.get('Origin')));
 }
-async function recordContactClick(req,env) {
+async function recordContactClick(req,env,ctx) {
   if(!allow(req))return json({error:'origin'},403);
   if(Number(req.headers.get('Content-Length')||0)>1024)return json({error:'too_large'},413);
   let input;
@@ -137,7 +137,28 @@ async function recordContactClick(req,env) {
   // eventId is unique for each click; retries with the same eventId are not double-counted.
   const saved=await env.DB.prepare('INSERT OR IGNORE INTO contact_clicks(id,visitor_id,clicked_at,kind,page) VALUES(?,?,?,?,?)')
     .bind(input.eventId,input.id,Date.now(),input.kind,page).run();
-  return json({ok:true,new:(saved.meta?.changes||0)>0},200,cors(req.headers.get('Origin')));
+  const fresh=(saved.meta?.changes||0)>0;
+  if(fresh){
+    // Notify the owner about a new, consented contact click. The click is
+    // written to visit_events so the Android/Windows apps (which poll
+    // /v1/events) show it too. It does not change visitor counts.
+    const now=Date.now();
+    const heading=input.kind==='whatsapp'?'💬 WhatsApp tıklaması':'☎ Telefon tıklaması';
+    const country=clean(req.cf?.country||'Bilinmiyor',50);
+    const city=clean(req.cf?.city||'Bilinmiyor',70);
+    const label=clean(heading+' · '+page,150);
+    try{
+      await env.DB.prepare('INSERT INTO visit_events(visitor_id,created_at,country,city,page) VALUES(?,?,?,?,?)')
+        .bind(input.id,now,country,city,label).run();
+    }catch{/* A failed notification must not lose the click count. */}
+    if(ctx){
+      if(env.TELEGRAM_BOT_TOKEN&&env.TELEGRAM_CHAT_ID)
+        ctx.waitUntil(sendTelegram(env,{time:now,country,city,page},heading).catch(()=>{}));
+      if(env.FCM_CLIENT_EMAIL&&env.FCM_PRIVATE_KEY&&env.FCM_PROJECT_ID)
+        ctx.waitUntil(pushToPhones(env,{time:now,country,city,page},heading).catch(()=>{}));
+    }
+  }
+  return json({ok:true,new:fresh},200,cors(req.headers.get('Origin')));
 }
 async function stats(env) {
  await ensureContactSchema(env);
@@ -201,7 +222,7 @@ export default {
     try {return await record(req,env,ctx)} catch(e){return json({error:'ingest_failed'},500,cors(origin))}
   }
   if (path==='/v1/contact-click' && req.method==='POST') {
-    try {return await recordContactClick(req,env)} catch(e){return json({error:'contact_click_failed'},500,cors(origin))}
+    try {return await recordContactClick(req,env,ctx)} catch(e){return json({error:'contact_click_failed'},500,cors(origin))}
   }
   if ((path==='/v1/stats'||path==='/v1/events')&&req.method==='GET') {
     if(!allow(req) || !authed(req,env)) return json({error:'Erişim reddedildi'},401,cors(origin));
