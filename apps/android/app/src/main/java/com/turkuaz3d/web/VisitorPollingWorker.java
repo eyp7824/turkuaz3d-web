@@ -69,8 +69,8 @@ public final class VisitorPollingWorker extends Worker {
                 return Result.success(); // Never notify for visits before setup.
             }
 
-            int[] counts=new int[3];
-            String[] latest={"","",""};
+            int visits=0;
+            String latest="";
             // The Worker returns up to 50 events per page; keep a bounded
             // catch-up loop so a busy day doesn't permanently skip visits.
             for(int page=0;page<10;page++) {
@@ -83,19 +83,15 @@ public final class VisitorPollingWorker extends Worker {
                     long id=event.optLong("id",0);
                     if(id<=cursor)continue;
                     cursor=id;
-                    String city=event.optString("city","Bilinmiyor");
-                    String country=event.optString("country","Bilinmiyor");
-                    String eventPage=event.optString("page","");
-                    int kind=Alerts.kind(city,eventPage);
-                    counts[kind]++;
-                    latest[kind]=kind==Alerts.VISIT?city+", "+country
-                            :city+", "+country+" \u00b7 "+eventPage;
+                    visits++;
+                    latest=event.optString("city","Bilinmiyor")+", "+
+                            event.optString("country","Bilinmiyor");
                 }
                 // Persist each completed page. Repeated runs never alert twice.
                 prefs.edit().putLong("cursor",cursor).commit();
                 if(events.length()<50)break;
             }
-            for(int k=0;k<3;k++)if(counts[k]>0)notifyKind(context,k,counts[k],latest[k]);
+            if(visits>0)notifyVisits(context,visits,latest);
         } catch(Exception ignored) {
             // Connectivity and authorization failures must not clear login data.
             // The next periodic execution retries without duplicating events.
@@ -134,31 +130,22 @@ public final class VisitorPollingWorker extends Worker {
         } finally {connection.disconnect();}
     }
 
-    private static void notifyKind(Context context,int kind,int count,String latest) {
+    private static void notifyVisits(Context context,int count,String latest) {
         NotificationManager manager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         if(manager==null)return;
-        Alerts.ensureChannels(context);
+        manager.createNotificationChannel(new NotificationChannel(CHANNEL,
+                "Turkuaz 3D ziyaretçi bildirimleri",NotificationManager.IMPORTANCE_HIGH));
         Intent open=new Intent(context,MainActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent action=PendingIntent.getActivity(context,7+kind,open,
+        PendingIntent action=PendingIntent.getActivity(context,7,open,
                 PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-        String title,message;
-        if(kind==Alerts.WHATSAPP) {
-            title="Turkuaz 3D Web \u00b7 WhatsApp t\u0131klamas\u0131";
-            message=(count==1?"":count+" t\u0131klama. Son: ")+latest;
-        } else if(kind==Alerts.PHONE) {
-            title="Turkuaz 3D Web \u00b7 Telefon t\u0131klamas\u0131";
-            message=(count==1?"":count+" t\u0131klama. Son: ")+latest;
-        } else {
-            title="Turkuaz 3D Web \u00b7 Ziyaret\u00e7i bildirimi";
-            message=(count==1?"Yeni ziyaret: ":count+" yeni ziyaret. Son ziyaret: ")+latest;
-        }
-        Notification note=new Notification.Builder(context,Alerts.channel(kind))
+        String message=(count==1?"Yeni ziyaret: ":count+" yeni ziyaret. Son ziyaret: ")+latest;
+        Notification note=new Notification.Builder(context,CHANNEL)
                 .setSmallIcon(R.drawable.t3_icon)
-                .setContentTitle(title)
+                .setContentTitle("Turkuaz 3D Web · Ziyaretçi bildirimi")
                 .setContentText(message)
                 .setStyle(new Notification.BigTextStyle().bigText(message))
                 .setContentIntent(action).setAutoCancel(true).build();
-        manager.notify(Alerts.notificationId(kind),note);
+        manager.notify(12000,note);
     }
 }
