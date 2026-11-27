@@ -19,6 +19,7 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['hizmetler/yazici-silindirik-baglayici/index.html','https://turkuaz3d.com/hizmetler/yazici-silindirik-baglayici/'],
 ['hizmetler/prototip-turbofan/index.html','https://turkuaz3d.com/hizmetler/prototip-turbofan/'],
 ['hizmetler/antika-corap-makinesi-silindiri/index.html','https://turkuaz3d.com/hizmetler/antika-corap-makinesi-silindiri/'],
 ['hizmetler/vinc-kumanda-muhafaza-kutusu/index.html','https://turkuaz3d.com/hizmetler/vinc-kumanda-muhafaza-kutusu/'],
