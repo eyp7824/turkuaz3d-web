@@ -19,6 +19,8 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['hizmetler/vinc-kumanda-muhafaza-kutusu/index.html','https://turkuaz3d.com/hizmetler/vinc-kumanda-muhafaza-kutusu/'],
+['hizmetler/18650-pil-mengenesi/index.html','https://turkuaz3d.com/hizmetler/18650-pil-mengenesi/'],
 ['hizmetler/nfc-koruma-kutusu/index.html','https://turkuaz3d.com/hizmetler/nfc-koruma-kutusu/'],
 ['hizmetler/kanepe-ayagi-aparati/index.html','https://turkuaz3d.com/hizmetler/kanepe-ayagi-aparati/'],
 ['hizmetler/kelebek-anahtarlik/index.html','https://turkuaz3d.com/hizmetler/kelebek-anahtarlik/'],
