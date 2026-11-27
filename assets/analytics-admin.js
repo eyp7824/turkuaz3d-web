@@ -131,7 +131,7 @@ window.T3ReceivePushToken = async function(deviceToken) {
 };
 function nativeNotification(event){
  const city=event.city||'Bilinmiyor',country=event.country||'Bilinmiyor';
- const isClick=/^(💬|☎)/.test(event.page||'');
+ const isClick=/^(💬|☎)/.test(event.city||'');
  const title=isClick?'Turkuaz 3D Web · İletişim tıklaması':'Turkuaz 3D Web · Yeni ziyaret';
  const message=city+', '+country+' · '+(event.page||'/');
  if(window.TurkuazNative&&typeof window.TurkuazNative.showNotification==='function'){
