@@ -146,10 +146,12 @@ async function recordContactClick(req,env,ctx) {
     const heading=input.kind==='whatsapp'?'💬 WhatsApp tıklaması':'☎ Telefon tıklaması';
     const country=clean(req.cf?.country||'Bilinmiyor',50);
     const city=clean(req.cf?.city||'Bilinmiyor',70);
-    const label=clean(heading+' · '+page,150);
+    // The Android app's background alert shows only "city, country", so the
+    // click type goes in front of the city; the page stays a plain path.
+    const label=clean(heading+' · '+city,70);
     try{
       await env.DB.prepare('INSERT INTO visit_events(visitor_id,created_at,country,city,page) VALUES(?,?,?,?,?)')
-        .bind(input.id,now,country,city,label).run();
+        .bind(input.id,now,country,label,page).run();
     }catch{/* A failed notification must not lose the click count. */}
     if(ctx){
       if(env.TELEGRAM_BOT_TOKEN&&env.TELEGRAM_CHAT_ID)
