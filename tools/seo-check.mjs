@@ -19,6 +19,8 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['bolge/bursa-ilceleri-3d-baski/index.html','https://turkuaz3d.com/bolge/bursa-ilceleri-3d-baski/'],
+['bolge/turkiye-geneli-3d-baski/index.html','https://turkuaz3d.com/bolge/turkiye-geneli-3d-baski/'],
 ['blog/pla-petg-farki/index.html','https://turkuaz3d.com/blog/pla-petg-farki/'],
 ['blog/stl-dosyasi-hazirlama-rehberi/index.html','https://turkuaz3d.com/blog/stl-dosyasi-hazirlama-rehberi/'],
 ['blog/prototipten-seri-uretime-gecis/index.html','https://turkuaz3d.com/blog/prototipten-seri-uretime-gecis/']
