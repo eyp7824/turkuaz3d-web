@@ -158,12 +158,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        NotificationManager notifications = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        if (notifications != null) {
-            NotificationChannel channel = new NotificationChannel(VISIT_CHANNEL, "Turkuaz 3D ziyaretçi bildirimleri", NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("Turkuaz 3D sitesine gelen yeni ziyaret bildirimleri.");
-            notifications.createNotificationChannel(channel);
-        }
+        Alerts.ensureChannels(this);
         if (Build.VERSION.SDK_INT < 33 ||
                 checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED)
             scheduleBackgroundVisits();
@@ -188,11 +183,13 @@ public class MainActivity extends Activity {
                     checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
                 NotificationManager nm=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 if(nm==null) return;
+                Alerts.ensureChannels(MainActivity.this);
+                int kind=Alerts.kind(message,title);
                 Intent intent=new Intent(MainActivity.this,MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 PendingIntent tap=PendingIntent.getActivity(MainActivity.this,0,intent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                Notification n=new Notification.Builder(MainActivity.this,VISIT_CHANNEL)
+                Notification n=new Notification.Builder(MainActivity.this,Alerts.channel(kind))
                     .setSmallIcon(R.drawable.t3_icon)
                     .setContentTitle(title==null?"Turkuaz 3D Web":title.substring(0,Math.min(70,title.length())))
                     .setContentText(message==null?"Yeni ziyaret":message.substring(0,Math.min(150,message.length())))
