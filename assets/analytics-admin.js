@@ -131,7 +131,8 @@ window.T3ReceivePushToken = async function(deviceToken) {
 };
 function nativeNotification(event){
  const city=event.city||'Bilinmiyor',country=event.country||'Bilinmiyor';
- const title='Turkuaz 3D Web · Yeni ziyaret';
+ const isClick=/^(💬|☎)/.test(event.page||'');
+ const title=isClick?'Turkuaz 3D Web · İletişim tıklaması':'Turkuaz 3D Web · Yeni ziyaret';
  const message=city+', '+country+' · '+(event.page||'/');
  if(window.TurkuazNative&&typeof window.TurkuazNative.showNotification==='function'){
    if(localStorage.getItem('t3-fcm-registered')==='true')return; // Push service handles delivery.
