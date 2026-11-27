@@ -19,6 +19,7 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['hizmetler/engelli-bardak-tutucu/index.html','https://turkuaz3d.com/hizmetler/engelli-bardak-tutucu/'],
 ['hizmetler/metal-dedektor-kontrol-kutusu/index.html','https://turkuaz3d.com/hizmetler/metal-dedektor-kontrol-kutusu/'],
 ['hizmetler/engelli-cay-bardagi-tutucu/index.html','https://turkuaz3d.com/hizmetler/engelli-cay-bardagi-tutucu/'],
 ['en/index.html','https://turkuaz3d.com/en/'],
