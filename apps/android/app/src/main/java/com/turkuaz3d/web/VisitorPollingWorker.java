@@ -85,11 +85,11 @@ public final class VisitorPollingWorker extends Worker {
                     cursor=id;
                     String city=event.optString("city","Bilinmiyor");
                     String country=event.optString("country","Bilinmiyor");
-                    String page=event.optString("page","");
-                    int kind=Alerts.kind(city,page);
+                    String eventPage=event.optString("page","");
+                    int kind=Alerts.kind(city,eventPage);
                     counts[kind]++;
                     latest[kind]=kind==Alerts.VISIT?city+", "+country
-                            :city+", "+country+" \u00b7 "+page;
+                            :city+", "+country+" \u00b7 "+eventPage;
                 }
                 // Persist each completed page. Repeated runs never alert twice.
                 prefs.edit().putLong("cursor",cursor).commit();
