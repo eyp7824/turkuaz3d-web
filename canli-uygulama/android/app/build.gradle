@@ -1,0 +1,38 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.turkuaz3d.web'
+    compileSdk 36
+    defaultConfig {
+        // Separate id: installs beside the old app, so its saved login is not lost.
+        applicationId 'com.turkuaz3d.web.canli'
+        minSdk 26
+        targetSdk 35
+        versionCode 13
+        versionName '1.2.0'
+    }
+    def localKey = new Properties()
+    def localKeyFile = rootProject.file('imza.properties')
+    if (localKeyFile.exists()) localKeyFile.withInputStream { localKey.load(it) }
+    signingConfigs {
+        stableRelease {
+            storeFile file('release-signing.p12')
+            storeType 'pkcs12'
+            storePassword localKey.getProperty('password', 'not-configured')
+            keyAlias 'turkuaz3d'
+            keyPassword localKey.getProperty('password', 'not-configured')
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.stableRelease
+            minifyEnabled false
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-messaging:24.1.2'
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.work:work-runtime:2.10.5'
+}
