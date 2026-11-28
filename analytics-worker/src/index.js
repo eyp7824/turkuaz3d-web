@@ -143,7 +143,8 @@ async function recordContactClick(req,env,ctx) {
     // written to visit_events so the Android/Windows apps (which poll
     // /v1/events) show it too. It does not change visitor counts.
     const now=Date.now();
-    const heading=input.kind==='whatsapp'?'💬 WhatsApp tıklaması':'☎ Telefon tıklaması';
+    // The Android app picks the alert sound from these exact prefixes.
+    const heading=input.kind==='whatsapp'?'📲 WhatsApp tıklandı':'📞 Telefon tıklandı';
     const country=clean(req.cf?.country||'Bilinmiyor',50);
     const city=clean(req.cf?.city||'Bilinmiyor',70);
     // The Android app's background alert shows only "city, country", so the

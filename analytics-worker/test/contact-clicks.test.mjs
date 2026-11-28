@@ -69,11 +69,11 @@ test('contact clicks: new click notifies the owner (events feed, Telegram, FCM p
     await Promise.all(pending);
     const feed=await (await worker.fetch(req('/v1/events?after=0',null,'https://turkuaz3d.com',env.ADMIN_KEY),env)).json();
     assert.equal(feed.events.length,1);
-    assert.match(feed.events[0].city,/^☎ Telefon tıklaması · /,'click type must lead the city so the Android alert shows it');
+    assert.match(feed.events[0].city,/^📞 Telefon tıklandı · /,'click type must lead the city so the Android alert shows it');
     assert.equal(feed.events[0].page,'/hizmetler/3d-baski/');
     const telegram=calls.filter(c=>c.url.includes('api.telegram.org'));
     assert.equal(telegram.length,1);
-    assert.match(JSON.parse(telegram[0].body).text,/Telefon tıklaması/);
+    assert.match(JSON.parse(telegram[0].body).text,/Telefon tıklandı/);
     assert.ok(!JSON.stringify(calls).includes('905423954447'),'phone numbers must never be sent');
     const stats=await (await worker.fetch(req('/v1/stats',null,'https://turkuaz3d.com',env.ADMIN_KEY),env)).json();
     assert.equal(stats.today,0,'click notifications must not inflate visitor counts');
