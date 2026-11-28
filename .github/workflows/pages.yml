@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html 404.html CNAME robots.txt sitemap.xml favicon-96x96.png _site/
-          cp -R assets data en hizmetler hizmet blog bolge sayfa iletisim sorular bloglar urunler hata yonetim public 3d-baski 3d-tasarim hizmetlerimiz lletisim _site/
+          cp -R assets data en hizmetler hizmet blog bolge urunler yonetim public _site/
           cp gizlilik.html cerez.html kvkk.html _site/
       - name: Set up GitHub Pages
         uses: actions/configure-pages@v5

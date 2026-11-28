@@ -45,7 +45,8 @@ for(const slug of ['','3d-baskida-malzeme-secimi','disli-ve-cark-uretimi',
  const url='https://turkuaz3d.com/blog/'+(slug?slug+'/':'');
  if(!sitemap.includes('<loc>'+url+'</loc>'))failures.push('Sitemap missing: '+url);
 }
-if(redirects<25)failures.push('Missing old URL redirects: only '+redirects+' found');
+// Only old addresses that still receive Google clicks are kept (2026-11-28).
+if(redirects<4)failures.push('Missing old URL redirects: only '+redirects+' found');
 if(failures.length){
  console.error('LEGACY URL AUDIT FAILED:\n'+failures.join('\n'));
  process.exit(1);
