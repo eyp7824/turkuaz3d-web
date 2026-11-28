@@ -19,6 +19,7 @@ const pages=[
 ['hizmetler/3d-baski-fiyatlari/index.html','https://turkuaz3d.com/hizmetler/3d-baski-fiyatlari/'],
 ['hizmetler/stl-dosyasi-ile-3d-baski/index.html','https://turkuaz3d.com/hizmetler/stl-dosyasi-ile-3d-baski/'],
 ['hizmetler/fason-3d-baski/index.html','https://turkuaz3d.com/hizmetler/fason-3d-baski/'],
+['hizmetler/radyus-olcer-dijital-kumpas-aparati/index.html','https://turkuaz3d.com/hizmetler/radyus-olcer-dijital-kumpas-aparati/'],
 ['hizmetler/akulu-sandalye-baglanti-aparati/index.html','https://turkuaz3d.com/hizmetler/akulu-sandalye-baglanti-aparati/'],
 ['hizmetler/ucurtma-cita-branda-klipsi/index.html','https://turkuaz3d.com/hizmetler/ucurtma-cita-branda-klipsi/'],
 ['hizmetler/cokgen-vazo-kalibi/index.html','https://turkuaz3d.com/hizmetler/cokgen-vazo-kalibi/'],
